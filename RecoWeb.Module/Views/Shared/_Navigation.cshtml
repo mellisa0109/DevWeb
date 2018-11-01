@@ -1,0 +1,288 @@
+﻿@*@model RecoWeb.Module.Models.COW_MenuInquiryViewModel*@
+@model RecoWeb.Module.Models.NavMenuInquiryViewModel
+@using System.Globalization
+@using System.Threading;
+@using System.Xml;
+@using RecoWeb.Module
+
+@{
+    var _action = this.Url.RequestContext.RouteData.Values["action"].ToString();
+    var _control = this.Url.RequestContext.RouteData.Values["controller"].ToString();
+
+    var _menu = "";
+    var _middlemenu = "";
+    var _item = "";
+    var _recentVisitCount = "";
+    XmlDocument xml = new XmlDocument();
+    xml.Load(Server.MapPath("~/Settings/webSettings.xml"));
+    if (xml != null)
+    {
+        _recentVisitCount = xml.GetElementsByTagName("RecentVisitCount")[0].InnerText;
+    }
+
+
+    if (Model.COW_NavMenuListInquiry.Where(s => s.ActionMethod == _action && s.Controller == _control).Count() > 0)
+    {
+        if (Model.COW_NavMenuListInquiry.Where(s => s.ActionMethod == _action && s.Controller == _control).Count() > 0)
+        { _middlemenu = Model.COW_NavMenuListInquiry.Where(s => s.ActionMethod == _action && s.Controller == _control).FirstOrDefault().MenuCode.ToString(); }
+        if (Model.COW_NavMenuListInquiry.Where(s => s.ActionMethod == _action && s.Controller == _control).Count() > 0)
+        { _item = Model.COW_NavMenuListInquiry.Where(s => s.ActionMethod == _action && s.Controller == _control).FirstOrDefault().ParentMenuCode.ToString(); }
+
+        if (_middlemenu != "")
+        {
+            if (Model.COW_NavMenuListInquiry.Where(s => s.ParentMenuCode == _middlemenu).Count() > 0)
+            {
+                _menu = Model.COW_NavMenuListInquiry.Where(s => s.ParentMenuCode == _middlemenu).FirstOrDefault().MenuCode.ToString();
+            }
+
+            if(_menu == "Root")
+            {
+                _menu = _middlemenu;
+                _middlemenu = _item;
+            }
+        }
+
+        if (Session["MenuHistory"] != null)
+        {
+            var menuList = (Session["MenuHistory"] as List<Tuple<string, string, string>>);
+
+            //최근 방문 리스트에 선택한 메뉴가 존재한다면
+            if (menuList.Contains(new Tuple<string, string, string>(Model.COW_NavMenuListInquiry.Where(s => s.ActionMethod == _action && s.Controller == _control).FirstOrDefault().ActionMethod.ToString()
+            , Model.COW_NavMenuListInquiry.Where(s => s.ActionMethod == _action && s.Controller == _control).FirstOrDefault().Controller.ToString()
+            , "Menu_" + Model.COW_NavMenuListInquiry.Where(s => s.ActionMethod == _action && s.Controller == _control).FirstOrDefault().ActionMethod.ToString())))
+            {
+                //선택한 메뉴 지우고, 새로 넣어줌
+                menuList.Remove(new Tuple<string, string, string>(Model.COW_NavMenuListInquiry.Where(s => s.ActionMethod == _action && s.Controller == _control).FirstOrDefault().ActionMethod.ToString()
+                , Model.COW_NavMenuListInquiry.Where(s => s.ActionMethod == _action && s.Controller == _control).FirstOrDefault().Controller.ToString()
+                , "Menu_" + Model.COW_NavMenuListInquiry.Where(s => s.ActionMethod == _action && s.Controller == _control).FirstOrDefault().ActionMethod.ToString()));
+
+                menuList.Add(new Tuple<string, string, string>(Model.COW_NavMenuListInquiry.Where(s => s.ActionMethod == _action && s.Controller == _control).FirstOrDefault().ActionMethod.ToString()
+                , Model.COW_NavMenuListInquiry.Where(s => s.ActionMethod == _action && s.Controller == _control).FirstOrDefault().Controller.ToString()
+                , "Menu_" + Model.COW_NavMenuListInquiry.Where(s => s.ActionMethod == _action && s.Controller == _control).FirstOrDefault().ActionMethod.ToString()));
+                
+            }
+            else
+            {
+                //존재하지 않는다면 단순 추가
+                menuList.Add(new Tuple<string, string, string>(Model.COW_NavMenuListInquiry.Where(s => s.ActionMethod == _action && s.Controller == _control).FirstOrDefault().ActionMethod.ToString()
+                    , Model.COW_NavMenuListInquiry.Where(s => s.ActionMethod == _action && s.Controller == _control).FirstOrDefault().Controller.ToString()
+                    , "Menu_" + Model.COW_NavMenuListInquiry.Where(s => s.ActionMethod == _action && s.Controller == _control).FirstOrDefault().ActionMethod.ToString()));
+            }
+
+            //최근 방문 메뉴 사이즈 체크
+            for (int dCount = menuList.Count; dCount > Convert.ToInt32(_recentVisitCount); dCount = menuList.Count)
+            {
+                menuList.RemoveAt(0);
+            }
+            Session["MenuHistory"] = menuList;
+
+            //var dictionary = (Session["MenuHistory"] as SortedDictionary<int, Tuple<string,string,string>>);
+
+            //if (!dictionary.ContainsValue(new Tuple<string,string,string>(Model.COW_NavMenuListInquiry.Where(s => s.ActionMethod == _action && s.Controller == _control).FirstOrDefault().ActionMethod.ToString()
+            //, Model.COW_NavMenuListInquiry.Where(s => s.ActionMethod == _action && s.Controller == _control).FirstOrDefault().Controller.ToString()
+            //, "Menu_" + Model.COW_NavMenuListInquiry.Where(s => s.ActionMethod == _action && s.Controller == _control).FirstOrDefault().ActionMethod.ToString())))
+            //{
+            //    for(int dCount = dictionary.Count; dCount >= Convert.ToInt32(_recentVisitCount); dCount = dictionary.Count)
+            //    {
+            //        dictionary.Remove(dictionary.First().Key);
+            //    }
+
+            //    dictionary.Add(dictionary.Last().Key + 1, new Tuple<string, string, string>(Model.COW_NavMenuListInquiry.Where(s => s.ActionMethod == _action && s.Controller == _control).FirstOrDefault().ActionMethod.ToString()
+            //        , Model.COW_NavMenuListInquiry.Where(s => s.ActionMethod == _action && s.Controller == _control).FirstOrDefault().Controller.ToString()
+            //        , "Menu_" + Model.COW_NavMenuListInquiry.Where(s => s.ActionMethod == _action && s.Controller == _control).FirstOrDefault().ActionMethod.ToString())
+            //                );
+            //    Session["MenuHistory"] = dictionary;
+            //}
+        }
+        else
+        {
+            List<Tuple<string, string, string>> currentMenu = new List<Tuple<string, string, string>>()
+                {
+                    {new Tuple<string,string,string>(Model.COW_NavMenuListInquiry.Where(s => s.ActionMethod == _action && s.Controller == _control).FirstOrDefault().ActionMethod.ToString()
+                    , Model.COW_NavMenuListInquiry.Where(s => s.ActionMethod == _action && s.Controller == _control).FirstOrDefault().Controller.ToString()
+                    , "Menu_"+Model.COW_NavMenuListInquiry.Where(s => s.ActionMethod == _action && s.Controller == _control).FirstOrDefault().ActionMethod.ToString()) }
+                };
+
+            Session.Add("MenuHistory", currentMenu);
+
+
+            //SortedDictionary<int, Tuple<string, string, string>> currentMenu = new SortedDictionary<int, Tuple<string, string, string>>()
+            //    {
+            //        {0, new Tuple<string,string,string>(Model.COW_NavMenuListInquiry.Where(s => s.ActionMethod == _action && s.Controller == _control).FirstOrDefault().ActionMethod.ToString()
+            //        , Model.COW_NavMenuListInquiry.Where(s => s.ActionMethod == _action && s.Controller == _control).FirstOrDefault().Controller.ToString()
+            //        , "Menu_"+Model.COW_NavMenuListInquiry.Where(s => s.ActionMethod == _action && s.Controller == _control).FirstOrDefault().ActionMethod.ToString()) }
+            //    };
+
+            //Session.Add("MenuHistory", currentMenu);
+        }
+    }
+
+    var south_korea = Url.Content("~/Content/Images/south-korea_clicked_32.png");
+    var usa = Url.Content("~/Content/Images/usa_clicked_32.png");
+    if (Session["CurrentCulture"] != null)
+    {
+        if(Session["CurrentCulture"].ToString() == "0")
+        {
+            south_korea = Url.Content("~/Content/Images/south-korea_32.png");
+        }
+        else if (Session["CurrentCulture"].ToString() == "1")
+        {
+            usa = Url.Content("~/Content/Images/usa_32.png");
+        }
+    }
+}
+
+<nav class="navbar-default navbar-static-side" role="navigation">
+    <div class="sidebar-collapse">
+        <ul class="nav" id="side-menu">
+
+            @*이미지 로고*@
+            @*<li class="nav-header" style="padding:0px;">
+                <a href="@Url.Action("Index","Home")" style="padding:0px;">
+                    <img alt="Logo" src="~/Images/menu_title.png"/>
+                </a>
+            </li>*@     
+            
+            @*Home 버튼*@
+            <li class="in ">
+                <a href="@Url.Action("Index","Home")"><i class="fa fa-home"></i>
+                    <span class="nav-label">
+                        @Model.resourceManager.String("Menu_Home")
+                    </span></a>
+            </li>
+
+            @foreach (var menu in Model.COW_NavMenuListInquiry.Where(s => s.MenuCode == "Root"))
+            {
+                    <li class="@if (menu.ParentMenuCode == _menu || menu.ActionMethod != "") {@Html.IsSelected(action: menu.ActionMethod)} else { @Html.IsSelected(action: menu.ActionMethod, cssClass: "in") } ">
+                        <a href="@Url.Action(menu.ActionMethod, menu.Controller)"><i class="@menu.Icon"></i>
+                            <span class="nav-label">                                
+                                @Model.resourceManager.String("Menu_" + @menu.ParentMenuCode.ToString())
+                            </span> @if (Model.COW_NavMenuListInquiry.Where(s => s.MenuCode == menu.ParentMenuCode).Count() > 0) {<span class="fa arrow"></span>}</a>
+
+                        @if (Model.COW_NavMenuListInquiry.Where(s => s.MenuCode == menu.ParentMenuCode).Count() > 0)
+                        {
+                            <ul class="nav nav-second-level collapse @Html.IsSelected(controller: menu.ParentMenuCode, cssClass: "in")">
+                                @foreach (var middle in Model.COW_NavMenuListInquiry.Where(s => s.MenuCode == menu.ParentMenuCode))
+                                {
+                                    <li class="@if (middle.ParentMenuCode != _middlemenu || middle.ParentMenuCode == "") {@Html.IsSelected(action: middle.ActionMethod, cssClass: "in")} else { @Html.IsSelected(action: middle.ActionMethod) }">
+                                        <a href="@Url.Action(middle.ActionMethod, middle.Controller)"><i class="@middle.Icon only-mobile"></i>
+                                            <span class="nav-label only-mobile">
+                                                @Model.resourceManager.String("Menu_" + @middle.ParentMenuCode.ToString())
+                                            </span>@if (Model.COW_NavMenuListInquiry.Where(s => s.MenuCode == middle.ParentMenuCode).Count() > 0) {<span class="fa arrow only-mobile"></span>}</a>
+                                        @if (Model.COW_NavMenuListInquiry.Where(s => s.MenuCode == middle.ParentMenuCode).Count() > 0)
+                                        {
+                                            if (middle.ParentMenuCode == _middlemenu)
+                                            {
+                                                <ul class="nav nav-third-level collapse @Html.IsSelected(controller: menu.ParentMenuCode, cssClass: "in")">
+                                                    @foreach (var item in Model.COW_NavMenuListInquiry.Where(s => s.MenuCode == middle.ParentMenuCode))
+                                                    {
+                                                        <li class="@Html.IsSelected(action: item.ActionMethod)">
+                                                            <a href="@Url.Action(item.ActionMethod, item.Controller)" class="nav-third-item"><i class="@item.Icon only-mobile"></i>
+                                                                <span class="nav-label only-mobile">
+                                                                    @Model.resourceManager.String("Menu_" + @item.ParentMenuCode.ToString())
+                                                                </span> </a>
+                                                        </li>
+                                                    }
+                                                </ul>
+                                            }
+                                            else
+                                            {
+                                                <ul class="nav nav-third-level collapse @Html.IsSelected(controller: menu.ParentMenuCode)">
+                                                    @foreach (var item in Model.COW_NavMenuListInquiry.Where(s => s.MenuCode == middle.ParentMenuCode))
+                                                    {
+                                                        <li class="@Html.IsSelected(action: item.ActionMethod, cssClass: "in")">
+                                                            <a href="@Url.Action(item.ActionMethod, item.Controller)" class="nav-third-item"><i class="@item.Icon only-mobile"></i>
+                                                                <span class="nav-label only-mobile">
+                                                                    @Model.resourceManager.String("Menu_" + @item.ParentMenuCode.ToString())
+                                                                </span> </a>
+                                                        </li>
+                                                    }
+                                                </ul>
+                                            }
+                                        }
+                                    </li>
+                                }
+                            </ul>
+                        }
+                    </li>
+                }
+
+                @*<li class="in ">
+                    <a href="@Url.Action("InquiryData","Exam")"><i class="fa fa-home"></i><span class="nav-label">Exam</span></a>
+                </li>*@
+            </ul>
+        </div>
+    </nav>
+@section Scripts {
+<script src="../Scripts/jquery-3.1.1.min.js"></script>
+<script src="../Content/style.css"></script>
+<script src="../Content/reco_style.css"></script>
+}
+
+@*홈버튼에 프로필-하위메뉴 나타내는 소스*@
+@*<li class="nav-header">
+    <a href="@Url.Action("Index","Home")">
+        <img alt="Logo" src="~/Images/ci_um.png" />
+    </a>
+
+    <div class="dropdown profile-element">
+
+        <span>
+            <img alt="image" class="img-circle profile-image-small" src="~/Content/Images/user.png" />
+        </span>
+        <a data-toggle="dropdown" class="dropdown-toggle" href="#">
+            <span class="clear">
+                <span class="block m-t-xs">
+                        <strong class="font-bold">박똘똘</strong>
+                    </span> <span class="text-muted text-xs block">사원<b class="caret"></b></span>
+                <span class="text-muted text-xs block">@User.Identity.Name<b class="caret"></b></span>
+            </span>
+        </a>
+        <ul class="dropdown-menu dropdown-alerts animated fadeInRight m-t-xs">
+            <li>
+                <a href="#">
+                    <div>
+                        <i class="fa fa-key" aria-hidden="true"></i> 비밀번호 변경
+                    </div>
+                </a>
+            </li>
+            <li class="divider"></li>
+            <li>
+                <div class="div-language" style="padding:3px 10px; min-height:0;">
+                    <button type="button" class="btn-language-transform language-south-korea"><img src="~/Content/Images/south-korea_32.png" alt="korea" /></button>
+                        <button type="button" class="btn-language-transform language-china"><img src="~/Content/Images/china_32.png" alt="china" /></button>
+                        <button type="button" class="btn-language-transform language-brazil"><img src="~/Content/Images/brazil_32.png" alt="brazil" /></button>*@
+
+
+                    @*@{
+                        // 나라 이미지를 추가할때 필요한것
+                        // 1. ~/Content/Images/나라이름_32.png
+                        // 2. <a태그 안에 class="btn-language-transform language-나라이름"추가
+                        // * 1번과 2번의 나라이름은 동일하게 사용해야함.
+                        CultureInfo currentCulture = Thread.CurrentThread.CurrentCulture;
+
+                        <a href="/Account/ChangeCurrentCulture/0" class="btn-language-transform language-south-korea"><img src="@south_korea" /></a>
+                                    <a href="/Account/ChangeCurrentCulture/1" class="btn-language-transform language-usa"><img src="@usa" /></a>
+                    }
+                </div>
+            </li>
+            <li class="divider"></li>
+            <li>
+                <a href="@Url.Action("LogOff", "Account")">
+                    <i class="fa fa-sign-out" aria-hidden="true"></i> 로그아웃
+                </a>
+            </li>
+        </ul>
+    </div>
+    <div class="logo-element">
+
+    </div>
+</li>*@
+
+@*Home 버튼*@
+@*<li class="in ">
+    <a href="@Url.Action("Index","Home")"><i class="fa fa-home"></i>
+        <span class="nav-label">
+            @Model.resourceManager.String("Menu_Home")
+        </span></a>
+</li>*@

@@ -1,0 +1,68 @@
+﻿@using System.Globalization
+@using System.Threading;
+@model RecoWeb.Module.Models.LoginViewModel
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>@ViewBag.Title</title>
+
+    <link href="@Url.Action("bootstrap.min.css", "Content")" rel="stylesheet" type="text/css" />
+    <link href="@Url.Action("font-awesome/css/font-awesome.css", "fonts")" rel="stylesheet" type="text/css" />
+
+    <link href="@Url.Action("animate.css", "Content")" rel="stylesheet" type="text/css" />
+    <link href="@Url.Action("style.css", "Content")" rel="stylesheet" type="text/css" />
+    <link href="@Url.Action("reco_style.css", "Content")" rel="stylesheet" type="text/css" />
+
+</head>
+
+<body class="gray-bg">
+    <div class="layer-center">
+        <div class="login-body">
+            <img src="~/Images/3RFACTORY.png">
+            @using (Html.BeginForm("Login", "Account", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+            {
+                @Html.AntiForgeryToken()
+
+                <h4>Welcome to 3R-Factory</h4>
+
+                <div style="color:red;">
+                    @Html.ValidationSummary(true)
+                </div>
+                <div class="login-item">
+                    @Html.TextBoxFor(m => m.UserName, new { @class = "form-control", @type = "text", @placeholder = "Username", @required = "" })
+                    @Html.ValidationMessageFor(m => m.UserName)
+                </div>
+                <div class="login-item">
+                    @Html.PasswordFor(m => m.Password, new { @class = "form-control", @type = "password", @placeholder = "Password", @required = "" })
+                    @Html.ValidationMessageFor(m => m.Password)
+                </div>
+                <div style="padding-bottom: 10px;">
+                    <div class="checkbox">
+                        @Html.CheckBoxFor(m => m.RememberMe, new { @style= "position:inherit;" })
+                        @Html.LabelFor(m => m.RememberMe)
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="login-item">
+                        <input type="submit" value="Log in" class="btn bg-primary block full-width m-b" />
+                    </div>
+                </div>
+            }
+            <h4>Copyright ㈜ RecoSystem All Rights Reserved.</h4>
+        </div>
+        
+    </div>
+    
+</body>
+</html>
+
+<script src= "../Scripts/jquery.validate.min.js"></script>

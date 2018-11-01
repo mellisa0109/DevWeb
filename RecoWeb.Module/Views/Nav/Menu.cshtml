@@ -1,0 +1,143 @@
+﻿@using System.Globalization
+@using System.Threading;
+@model RecoWeb.Module.Models.NavMenuInquiryViewModel
+
+
+<nav class="navbar-default navbar-static-side" role="navigation">
+    <div class="sidebar-collapse">
+        <ul class="nav" id="side-menu">
+            <li class="nav-header">
+                @*로그인하기전 화면*@
+                @*<div class="dropdown profile-element">
+                        <a data-toggle="dropdown" class="dropdown-toggle" href="#">
+                            <span class="clear">
+                                <span class="block m-t-xs">
+                                    <strong class="font-bold">Example user</strong>
+                                </span> <span class="text-muted text-xs block">Example menu<b class="caret"></b></span>
+                            </span>
+                        </a>
+                        <ul class="dropdown-menu animated fadeInRight m-t-xs">
+                            <li><a href="#">회원가입</a></li>
+                            <li><a href="#">로그인</a></li>
+                        </ul>
+                    </div>*@
+
+                @*로그인후 화면*@
+
+                <div class="dropdown profile-element">
+                    <span>
+                        @*<img alt="image" class="img-circle profile-image-small" src="~/Content/Images/user.png" />*@
+                    </span>
+                    <a data-toggle="dropdown" class="dropdown-toggle" href="#">
+                        <span class="clear">
+                            @*<span class="block m-t-xs">
+                                    <strong class="font-bold">@User.Identity.Name </strong>
+                                </span>*@
+                            <span class="text-muted text-xs block">@User.Identity.Name<b class="caret"></b></span>
+                        </span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-alerts animated fadeInRight m-t-xs">
+                        <li>
+                            <a href="#">
+                                <div>
+                                    <i class="fa fa-key" aria-hidden="true"></i> 비밀번호 변경
+                                </div>
+                            </a>
+                        </li>
+                        <li class="divider"></li>
+                        <li>
+                            <div class="div-language" style="padding:3px 10px; min-height:0;">
+                                @*<button type="button" class="btn-language-transform language-south-korea"><img src="~/Content/Images/south-korea_32.png" alt="korea" /></button>
+                                    <button type="button" class="btn-language-transform language-china"><img src="~/Content/Images/china_32.png" alt="china" /></button>*@
+
+                                @{
+                                    // 나라 이미지를 추가할때 필요한것
+                                    // 1. ~/Content/Images/나라이름_32.png
+                                    // 2. <a태그 안에 class="btn-language-transform language-나라이름"추가
+                                    // * 1번과 2번의 나라이름은 동일하게 사용해야함.
+
+                                    // 현재 이미지 클릭시 Redirect 했을때 클릭된 이미지로 (나라이름_clicked_32.png) 변경되도록 해야함.
+                                    CultureInfo currentCulture = Thread.CurrentThread.CurrentCulture;
+                                    <a href="/Account/ChangeCurrentCulture/0" class="btn-language-transform language-south-korea"><img src="../Content/Images/south-korea_32.png" /></a>
+                                    <a href="/Account/ChangeCurrentCulture/1" class="btn-language-transform language-usa"><img src="../Content/Images/usa_32.png" /></a>
+                                }
+                            </div>
+                        </li>
+                        <li class="divider"></li>
+                        <li>
+                            <a href="@Url.Action("LogOff", "Account")">
+                                <i class="fa fa-sign-out" aria-hidden="true"></i> 로그아웃
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                @*미니 사이드메뉴 상단의 로고(기존에 Text를 넣어뒀었음)*@
+                @*<div class="logo-element">
+
+                    </div>*@
+            </li>
+
+            @*Home 버튼*@
+            <li class="in ">
+                <a href="@Url.Action("Index","Home")"><i class="fa fa-home"></i><span class="nav-label">Home</span></a>
+            </li>
+
+
+
+         
+            @foreach (var menu in Model.COW_NavMenuListInquiry.Where(s => s.ParentMenuCode == "Root"))
+            {
+                @*<li class="@if (menu.Category != "Item"){
+                                @Html.IsSelected(controller: menu.Controller, cssClass: "in")
+                            }
+                            else {
+                                @Html.IsSelected(action: menu.ActionMethod)
+                            } ">
+                    <a href="@Url.Action(menu.ActionMethod, menu.Controller)">
+                        <i class="@menu.Icon"></i>
+                        <span class="nav-label">@menu.MenuCode</span>
+                        <span class="fa arrow"></span>
+                    </a>
+
+                    @if (Model.COW_NavMenuListInquiry.Where(s => s.ParentMenuCode == menu.MenuCode).Count() > 0)
+                    {
+                        <ul class="nav nav-second-level collapse
+                                    @Html.IsSelected(controller: menu.Controller)">
+                            @foreach (var middle in Model.COW_NavMenuListInquiry.Where(s => s.ParentMenuCode == menu.MenuCode))
+                            {
+                                <li class="@if (menu.Category != "Item") {
+                                                @Html.IsSelected(controller: middle.Controller, cssClass: "in")}
+                                            else { 
+                                                @Html.IsSelected(action: middle.ActionMethod) }">
+                                    <a href="@Url.Action(middle.ActionMethod, middle.Controller)"><i class="@middle.Icon only-mobile"></i><span class="nav-label only-mobile">@middle.MenuCode</span><span class="fa arrow only-mobile"></span></a>
+
+                                    @if (Model.COW_NavMenuListInquiry.Where(s => s.ParentMenuCode == middle.MenuCode).Count() > 0)
+                                    {
+                                        <ul class="nav nav-third-level collapse @Html.IsSelected(controller: middle.Controller, cssClass: "in")">
+                                            @foreach (var item in Model.COW_NavMenuListInquiry.Where(s => s.ParentMenuCode == middle.MenuCode))
+                                            {
+                                                <li class="@Html.IsSelected(action: item.ActionMethod)">
+                                                    <a href="@Url.Action(item.ActionMethod, item.Controller)" class="nav-third-item"><i class="@item.Icon only-mobile"></i><span class="nav-label only-mobile">@item.MenuCode</span> </a>
+                                                </li>
+                                            }
+                                        </ul>
+                                    }
+                                </li>
+                            }
+                        </ul>
+                    }
+                </li>*@
+            }
+
+            @*<li class="@Html.IsSelected(action: "InquiryData")">
+                <a href="@Url.Action("InquiryData", "Exam")"><i class="fa fa-desktop"></i> <span class="nav-label">ExampleS</span></a>
+            </li>*@
+
+ 
+
+
+
+        </ul>
+    </div>
+</nav>

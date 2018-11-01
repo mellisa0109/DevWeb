@@ -1,0 +1,1135 @@
+﻿@model RecoWeb.Module.Models.PermissionViewModel
+@using RecoWeb.Domain.LocalResource
+
+@{
+
+    AjaxOptions ajaxInquiry = new AjaxOptions
+    {
+        HttpMethod = "GET",
+        InsertionMode = InsertionMode.Replace,
+        OnSuccess = "ContextInquiry",
+        UpdateTargetId = "Context"
+
+    };
+}
+@using (Ajax.BeginForm("AjaxInquiryContextMenuPermissions", "System", ajaxInquiry))
+{
+    <div class="row wrapper border-bottom white-bg page-heading">
+        <div class="col-lg-8 col-md-8 col-xs-12" style="display:flex;">
+            <span style="font-size:3rem; float:left; margin-right:0.5rem;">@Model.resourceManager.String("Menu_" + Model.ActivePage)</span>
+            <div style="align-self:flex-end; padding:0.5rem">
+                <ol class="breadcrumb">
+                    <li>
+                        <a href="@Url.Action("Index", "Home")">@Resource.Menu_Home</a>
+                    </li>
+
+                    @foreach (var page in Model.MenuLocation)
+                    {
+                        if (page == Model.ActivePage)
+                        {
+                            <li class="active">
+                                <strong>@Model.resourceManager.String("Menu_" + @page) </strong>
+                            </li>
+                        }
+                        else
+                        {
+                            <li>
+                                <span>@Model.resourceManager.String("Menu_" + @page)</span>
+                            </li>
+                        }
+                    }
+                </ol>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-4" style="margin-top: 0.5rem;">
+            <div class="btn-group pull-right ">
+                <button class="btn btn-default" type="submit" id="btn-find"><i class="fa fa-check"></i>&nbsp;@Resource.Inquiry</button>
+            </div>
+        </div>
+    </div>
+    <div class="row wrapper border-bottom white-bg check-item">
+    </div>
+
+}
+<div id="Context" class="row wrapper wrapper-content animated fadeInRight">
+    @Html.Partial("_Permissions")
+</div>
+
+<div class="modal inmodal fade" id="Modals" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg" onload="Loads()">
+        @Html.Partial("_PopupPermissionsAddRole", Model)
+    </div>
+</div>
+
+<div class="modal inmodal fade" id="ModalsEmployee" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg" onload="Loads()">
+        @Html.Partial("_PopupPermissionsAddEmployee", Model)
+    </div>
+</div>
+
+
+@section Styles {
+    <link href="@Url.Action("plugins/jqGrid/ui.jqgrid.css", "Content")" rel="stylesheet" type="text/css" />
+}
+
+@section Scripts {
+    <script src="../Scripts/jquery-3.1.1.min.js"></script>
+    <script src="../Scripts/plugins/jqGrid/i18n/grid.locale-en.js" type="text/javascript"></script>
+    <script src="../Scripts/plugins/jqGrid/jquery.jqGrid.min.js" type="text/javascript"></script>
+
+    <script type="text/javascript">
+
+        function ContextInquiry(returnValue) {
+            var data = returnValue;
+        }
+        var treeSelectedRow;
+        var isFisrt = true;
+        function tree1Change(selectedRow) {
+            try {
+                treeSelectedRow = selectedRow;
+                var orders = new DevExpress.data.CustomStore({
+                    load: function (loadOptions) {
+                        var deferred = $.Deferred(),
+                            args = {};
+
+                        if (loadOptions.sort) {
+                            args.orderby = loadOptions.sort[0].selector;
+                            if (loadOptions.sort[0].desc)
+                                args.orderby += " desc";
+                        }
+
+                        $.ajax({
+                            url: "../System/GetCOW_PermissionRoleInquiry?menuCode=" + treeSelectedRow.selectedRowsData[0].MenuCode,
+                            dataType: "json",
+                            data: args,
+                            success: function (result) {
+                                deferred.resolve(result.data);
+                            },
+                            error: function (e) {
+                                console.log("오류발생");
+                                console.log(e);
+                                deferred.reject("Data Loading Error");
+                            },
+                            timeout: 10000
+                        });
+                        return deferred.promise();
+                    }
+                });
+                $("#gridContainer02").dxDataGrid({
+                    dataSource: {
+                        store: orders
+                    }
+                }).dxDataGrid("instance").refresh();
+
+                var orders2 = new DevExpress.data.CustomStore({
+                    load: function (loadOptions) {
+                        var deferred = $.Deferred(),
+                            args = {};
+
+                        if (loadOptions.sort) {
+                            args.orderby = loadOptions.sort[0].selector;
+                            if (loadOptions.sort[0].desc)
+                                args.orderby += " desc";
+                        }
+
+                        $.ajax({
+                            url: "../System/GetCOW_PermissionEmployeeInquiry?menuCode=" + treeSelectedRow.selectedRowsData[0].MenuCode,
+                            dataType: "json",
+                            data: args,
+                            success: function (result) {
+                                deferred.resolve(result.data);
+                            },
+                            error: function (e) {
+                                console.log("오류발생");
+                                console.log(e);
+                                deferred.reject("Data Loading Error");
+                            },
+                            timeout: 10000
+                        });
+                        return deferred.promise();
+                    }
+                });
+                $("#gridContainer03").dxDataGrid({
+                    dataSource: {
+                        store: orders2
+                    }
+                }).dxDataGrid("instance").refresh();
+
+            } catch (e) {
+                console.log(e);
+            }
+        }
+
+        $(document).ready(function () {
+
+            $(':input:checked').parent('.btn').addClass('active');
+
+            //권한 추가 클릭
+            $('#btnCreateRole').click(function () {
+                try
+                {
+                    if (treeSelectedRow) {
+                        var pids = $('#gridContainer02').dxDataGrid('instance').getSelectedRowsData();
+                        if (pids.length > 0) {
+                            if (SetCOW_PermissionRoleCreateSave(treeSelectedRow.selectedRowsData[0].MenuCode, pids)) {
+                                var orders = new DevExpress.data.CustomStore({
+                                    load: function (loadOptions) {
+                                        var deferred = $.Deferred(),
+                                            args = {};
+
+                                        if (loadOptions.sort) {
+                                            args.orderby = loadOptions.sort[0].selector;
+                                            if (loadOptions.sort[0].desc)
+                                                args.orderby += " desc";
+                                        }
+
+                                        $.ajax({
+                                            url: "../System/GetCOW_PermissionRoleInquiry?menuCode=" + treeSelectedRow.selectedRowsData[0].MenuCode,
+                                            dataType: "json",
+                                            data: args,
+                                            success: function (result) {
+                                                deferred.resolve(result.data);
+                                            },
+                                            error: function (e) {
+                                                console.log("오류발생");
+                                                console.log(e);
+                                                deferred.reject("Data Loading Error");
+                                            },
+                                            timeout: 10000
+                                        });
+                                        return deferred.promise();
+                                    }
+                                });
+                                $("#gridContainer02").dxDataGrid({
+                                    dataSource: {
+                                        store: orders
+                                    }
+                                }).dxDataGrid("instance").refresh();
+                            }
+                        }
+                    }
+                } catch (e) {
+                    console.log(e);
+                }
+            });
+
+            //권한 읽기 클릭
+            $('#btnReadRole').click(function () {
+                try {
+                    if (treeSelectedRow) {
+                        var pids = $('#gridContainer02').dxDataGrid('instance').getSelectedRowsData();
+                        if (pids.length > 0) {
+                            if (SetCOW_PermissionRoleReadSave(treeSelectedRow.selectedRowsData[0].MenuCode, pids)) {
+                                var orders = new DevExpress.data.CustomStore({
+                                    load: function (loadOptions) {
+                                        var deferred = $.Deferred(),
+                                            args = {};
+
+                                        if (loadOptions.sort) {
+                                            args.orderby = loadOptions.sort[0].selector;
+                                            if (loadOptions.sort[0].desc)
+                                                args.orderby += " desc";
+                                        }
+
+                                        $.ajax({
+                                            url: "../System/GetCOW_PermissionRoleInquiry?menuCode=" + treeSelectedRow.selectedRowsData[0].MenuCode,
+                                            dataType: "json",
+                                            data: args,
+                                            success: function (result) {
+                                                deferred.resolve(result.data);
+                                            },
+                                            error: function (e) {
+                                                console.log("오류발생");
+                                                console.log(e);
+                                                deferred.reject("Data Loading Error");
+                                            },
+                                            timeout: 10000
+                                        });
+                                        return deferred.promise();
+                                    }
+                                });
+                                $("#gridContainer02").dxDataGrid({
+                                    dataSource: {
+                                        store: orders
+                                    }
+                                }).dxDataGrid("instance").refresh();
+                            }
+                        }
+                    }
+                } catch (e) {
+                    console.log(e);
+                }
+            });
+
+            //권한 수정 클릭
+            $('#btnUpdateRole').click(function () {
+                try {
+                    if (treeSelectedRow) {
+                        var pids = $('#gridContainer02').dxDataGrid('instance').getSelectedRowsData();
+                        if (pids.length > 0) {
+                            if (SetCOW_PermissionRoleUpdateSave(treeSelectedRow.selectedRowsData[0].MenuCode, pids)) {
+                                var orders = new DevExpress.data.CustomStore({
+                                    load: function (loadOptions) {
+                                        var deferred = $.Deferred(),
+                                            args = {};
+
+                                        if (loadOptions.sort) {
+                                            args.orderby = loadOptions.sort[0].selector;
+                                            if (loadOptions.sort[0].desc)
+                                                args.orderby += " desc";
+                                        }
+
+                                        $.ajax({
+                                            url: "../System/GetCOW_PermissionRoleInquiry?menuCode=" + treeSelectedRow.selectedRowsData[0].MenuCode,
+                                            dataType: "json",
+                                            data: args,
+                                            success: function (result) {
+                                                deferred.resolve(result.data);
+                                            },
+                                            error: function (e) {
+                                                console.log("오류발생");
+                                                console.log(e);
+                                                deferred.reject("Data Loading Error");
+                                            },
+                                            timeout: 10000
+                                        });
+                                        return deferred.promise();
+                                    }
+                                });
+                                $("#gridContainer02").dxDataGrid({
+                                    dataSource: {
+                                        store: orders
+                                    }
+                                }).dxDataGrid("instance").refresh();
+                            }
+                        }
+                    }
+                } catch (e) {
+                    console.log(e);
+                }
+            });
+
+            //권한 삭제 클릭
+            $('#btnDeleteRole').click(function () {
+                try {
+                    if (treeSelectedRow) {
+                        var pids = $('#gridContainer02').dxDataGrid('instance').getSelectedRowsData();
+                        if (pids.length > 0) {
+                            if (SetCOW_PermissionRoleDeleteSave(treeSelectedRow.selectedRowsData[0].MenuCode, pids)) {
+                                var orders = new DevExpress.data.CustomStore({
+                                    load: function (loadOptions) {
+                                        var deferred = $.Deferred(),
+                                            args = {};
+
+                                        if (loadOptions.sort) {
+                                            args.orderby = loadOptions.sort[0].selector;
+                                            if (loadOptions.sort[0].desc)
+                                                args.orderby += " desc";
+                                        }
+
+                                        $.ajax({
+                                            url: "../System/GetCOW_PermissionRoleInquiry?menuCode=" + treeSelectedRow.selectedRowsData[0].MenuCode,
+                                            dataType: "json",
+                                            data: args,
+                                            success: function (result) {
+                                                deferred.resolve(result.data);
+                                            },
+                                            error: function (e) {
+                                                console.log("오류발생");
+                                                console.log(e);
+                                                deferred.reject("Data Loading Error");
+                                            },
+                                            timeout: 10000
+                                        });
+                                        return deferred.promise();
+                                    }
+                                });
+                                $("#gridContainer02").dxDataGrid({
+                                    dataSource: {
+                                        store: orders
+                                    }
+                                }).dxDataGrid("instance").refresh();
+                            }
+                        }
+                    }
+                } catch (e) {
+                    console.log(e);
+                }
+            });
+
+            //역할없음 클릭
+            $('#btnNoAuthRole').click(function () {
+
+                try {
+                    if (treeSelectedRow) {
+                        var pids = $('#gridContainer02').dxDataGrid('instance').getSelectedRowsData();
+                        if (pids.length > 0) {
+                            if (SetCOW_PermissionRoleNoAuthSave(treeSelectedRow.selectedRowsData[0].MenuCode, pids)) {
+                                var orders = new DevExpress.data.CustomStore({
+                                    load: function (loadOptions) {
+                                        var deferred = $.Deferred(),
+                                            args = {};
+
+                                        if (loadOptions.sort) {
+                                            args.orderby = loadOptions.sort[0].selector;
+                                            if (loadOptions.sort[0].desc)
+                                                args.orderby += " desc";
+                                        }
+
+                                        $.ajax({
+                                            url: "../System/GetCOW_PermissionRoleInquiry?menuCode=" + treeSelectedRow.selectedRowsData[0].MenuCode,
+                                            dataType: "json",
+                                            data: args,
+                                            success: function (result) {
+                                                deferred.resolve(result.data);
+                                            },
+                                            error: function (e) {
+                                                console.log("오류발생");
+                                                console.log(e);
+                                                deferred.reject("Data Loading Error");
+                                            },
+                                            timeout: 10000
+                                        });
+                                        return deferred.promise();
+                                    }
+                                });
+                                $("#gridContainer02").dxDataGrid({
+                                    dataSource: {
+                                        store: orders
+                                    }
+                                }).dxDataGrid("instance").refresh();
+                            }
+                        }
+                    }
+                } catch (e) {
+                    console.log(e);
+                }
+            });
+
+            //역할추가 버튼 클릭
+            $('#btnAddRole').click(function () {
+                if (treeSelectedRow) {
+                    var vv = $('#gridContainer02').dxDataGrid('instance').getDataSource();
+                    Popup_PermissionRoleAdd(treeSelectedRow.selectedRowsData[0].MenuCode, vv.items());
+                }
+            });
+
+            //역할삭제버튼 클릭
+            $('#btnRemoveRole').click(function () {
+
+                try {
+                    if (treeSelectedRow) {
+                        var pids = $('#gridContainer02').dxDataGrid('instance').getSelectedRowsData();
+                        if (pids.length > 0) {
+                            if (SetCOW_PermissionRoleRemoveSave(treeSelectedRow.selectedRowsData[0].MenuCode, pids)) {
+                                var orders = new DevExpress.data.CustomStore({
+                                    load: function (loadOptions) {
+                                        var deferred = $.Deferred(),
+                                            args = {};
+
+                                        if (loadOptions.sort) {
+                                            args.orderby = loadOptions.sort[0].selector;
+                                            if (loadOptions.sort[0].desc)
+                                                args.orderby += " desc";
+                                        }
+
+                                        $.ajax({
+                                            url: "../System/GetCOW_PermissionRoleInquiry?menuCode=" + treeSelectedRow.selectedRowsData[0].MenuCode,
+                                            dataType: "json",
+                                            data: args,
+                                            success: function (result) {
+                                                deferred.resolve(result.data);
+                                            },
+                                            error: function (e) {
+                                                console.log("오류발생");
+                                                console.log(e);
+                                                deferred.reject("Data Loading Error");
+                                            },
+                                            timeout: 10000
+                                        });
+                                        return deferred.promise();
+                                    }
+                                });
+                                $("#gridContainer02").dxDataGrid({
+                                    dataSource: {
+                                        store: orders
+                                    }
+                                }).dxDataGrid("instance").refresh();
+                            }
+                        }
+                    }
+                } catch (e) {
+                    console.log(e);
+                }
+            });
+
+            //작업자 읽기 버튼 클릭
+            $('#btnCreateEmployee').click(function () {
+                try {
+                    if (treeSelectedRow) {
+                        var pids = $('#gridContainer03').dxDataGrid('instance').getSelectedRowsData();
+                        if (pids.length > 0) {
+                            if (SetCOW_PermissionEmployeeCreateSave(treeSelectedRow.selectedRowsData[0].MenuCode, pids)) {
+                                var orders = new DevExpress.data.CustomStore({
+                                    load: function (loadOptions) {
+                                        var deferred = $.Deferred(),
+                                            args = {};
+
+                                        if (loadOptions.sort) {
+                                            args.orderby = loadOptions.sort[0].selector;
+                                            if (loadOptions.sort[0].desc)
+                                                args.orderby += " desc";
+                                        }
+
+                                        $.ajax({
+                                            url: "../System/GetCOW_PermissionEmployeeInquiry?menuCode=" + treeSelectedRow.selectedRowsData[0].MenuCode,
+                                            dataType: "json",
+                                            data: args,
+                                            success: function (result) {
+                                                deferred.resolve(result.data);
+                                            },
+                                            error: function (e) {
+                                                console.log("오류발생");
+                                                console.log(e);
+                                                deferred.reject("Data Loading Error");
+                                            },
+                                            timeout: 10000
+                                        });
+                                        return deferred.promise();
+                                    }
+                                });
+                                $("#gridContainer03").dxDataGrid({
+                                    dataSource: {
+                                        store: orders
+                                    }
+                                }).dxDataGrid("instance").refresh();
+                            }
+                        }
+                    }
+                } catch (e) {
+                    console.log(e);
+                }
+            });
+
+            //작업자 읽기 버튼 클릭
+            $('#btnReadEmployee').click(function () {
+                try {
+                    if (treeSelectedRow) {
+                        var pids = $('#gridContainer03').dxDataGrid('instance').getSelectedRowsData();
+                        if (pids.length > 0) {
+                            if (SetCOW_PermissionEmployeeReadSave(treeSelectedRow.selectedRowsData[0].MenuCode, pids)) {
+                                var orders = new DevExpress.data.CustomStore({
+                                    load: function (loadOptions) {
+                                        var deferred = $.Deferred(),
+                                            args = {};
+
+                                        if (loadOptions.sort) {
+                                            args.orderby = loadOptions.sort[0].selector;
+                                            if (loadOptions.sort[0].desc)
+                                                args.orderby += " desc";
+                                        }
+
+                                        $.ajax({
+                                            url: "../System/GetCOW_PermissionEmployeeInquiry?menuCode=" + treeSelectedRow.selectedRowsData[0].MenuCode,
+                                            dataType: "json",
+                                            data: args,
+                                            success: function (result) {
+                                                deferred.resolve(result.data);
+                                            },
+                                            error: function (e) {
+                                                console.log("오류발생");
+                                                console.log(e);
+                                                deferred.reject("Data Loading Error");
+                                            },
+                                            timeout: 10000
+                                        });
+                                        return deferred.promise();
+                                    }
+                                });
+                                $("#gridContainer03").dxDataGrid({
+                                    dataSource: {
+                                        store: orders
+                                    }
+                                }).dxDataGrid("instance").refresh();
+                            }
+                        }
+                    }
+                } catch (e) {
+                    console.log(e);
+                }
+            });
+
+            //작업자 수정 버튼 클릭
+            $('#btnUpdateEmployee').click(function () {
+
+                try {
+                    if (treeSelectedRow) {
+                        var pids = $('#gridContainer03').dxDataGrid('instance').getSelectedRowsData();
+                        if (pids.length > 0) {
+                            if (SetCOW_PermissionEmployeeUpdateSave(treeSelectedRow.selectedRowsData[0].MenuCode, pids)) {
+                                var orders = new DevExpress.data.CustomStore({
+                                    load: function (loadOptions) {
+                                        var deferred = $.Deferred(),
+                                            args = {};
+
+                                        if (loadOptions.sort) {
+                                            args.orderby = loadOptions.sort[0].selector;
+                                            if (loadOptions.sort[0].desc)
+                                                args.orderby += " desc";
+                                        }
+
+                                        $.ajax({
+                                            url: "../System/GetCOW_PermissionEmployeeInquiry?menuCode=" + treeSelectedRow.selectedRowsData[0].MenuCode,
+                                            dataType: "json",
+                                            data: args,
+                                            success: function (result) {
+                                                deferred.resolve(result.data);
+                                            },
+                                            error: function (e) {
+                                                console.log("오류발생");
+                                                console.log(e);
+                                                deferred.reject("Data Loading Error");
+                                            },
+                                            timeout: 10000
+                                        });
+                                        return deferred.promise();
+                                    }
+                                });
+                                $("#gridContainer03").dxDataGrid({
+                                    dataSource: {
+                                        store: orders
+                                    }
+                                }).dxDataGrid("instance").refresh();
+                            }
+                        }
+                    }
+                } catch (e) {
+                    console.log(e);
+                }
+            });
+
+            //작업자 삭제 버튼 클릭
+            $('#btnDeleteEmployee').click(function () {
+
+                try {
+                    if (treeSelectedRow) {
+                        var pids = $('#gridContainer03').dxDataGrid('instance').getSelectedRowsData();
+                        if (pids.length > 0) {
+
+                            if (SetCOW_PermissionEmployeeDeleteSave(treeSelectedRow.selectedRowsData[0].MenuCode, pids)) {
+                                var orders = new DevExpress.data.CustomStore({
+                                    load: function (loadOptions) {
+                                        var deferred = $.Deferred(),
+                                            args = {};
+
+                                        if (loadOptions.sort) {
+                                            args.orderby = loadOptions.sort[0].selector;
+                                            if (loadOptions.sort[0].desc)
+                                                args.orderby += " desc";
+                                        }
+
+                                        $.ajax({
+                                            url: "../System/GetCOW_PermissionEmployeeInquiry?menuCode=" + treeSelectedRow.selectedRowsData[0].MenuCode,
+                                            dataType: "json",
+                                            data: args,
+                                            success: function (result) {
+                                                deferred.resolve(result.data);
+                                            },
+                                            error: function (e) {
+                                                console.log("오류발생");
+                                                console.log(e);
+                                                deferred.reject("Data Loading Error");
+                                            },
+                                            timeout: 10000
+                                        });
+                                        return deferred.promise();
+                                    }
+                                });
+                                $("#gridContainer03").dxDataGrid({
+                                    dataSource: {
+                                        store: orders
+                                    }
+                                }).dxDataGrid("instance").refresh();
+                            }
+                        }
+                    }
+                } catch (e) {
+                    console.log(e);
+                }
+            });
+            //작업자 권한없음 버튼 클릭
+            $('#btnNoAuthEmployee').click(function () {
+
+                try {
+                    if (treeSelectedRow) {
+                        var pids = $('#gridContainer03').dxDataGrid('instance').getSelectedRowsData();
+                        if (pids.length > 0) {
+                            if (SetCOW_PermissionEmployeeNoAuthSave(treeSelectedRow.selectedRowsData[0].MenuCode, pids)) {
+                                var orders = new DevExpress.data.CustomStore({
+                                    load: function (loadOptions) {
+                                        var deferred = $.Deferred(),
+                                            args = {};
+
+                                        if (loadOptions.sort) {
+                                            args.orderby = loadOptions.sort[0].selector;
+                                            if (loadOptions.sort[0].desc)
+                                                args.orderby += " desc";
+                                        }
+
+                                        $.ajax({
+                                            url: "../System/GetCOW_PermissionEmployeeInquiry?menuCode=" + treeSelectedRow.selectedRowsData[0].MenuCode,
+                                            dataType: "json",
+                                            data: args,
+                                            success: function (result) {
+                                                deferred.resolve(result.data);
+                                            },
+                                            error: function (e) {
+                                                console.log("오류발생");
+                                                console.log(e);
+                                                deferred.reject("Data Loading Error");
+                                            },
+                                            timeout: 10000
+                                        });
+                                        return deferred.promise();
+                                    }
+                                });
+                                $("#gridContainer03").dxDataGrid({
+                                    dataSource: {
+                                        store: orders
+                                    }
+                                }).dxDataGrid("instance").refresh();
+                            }
+                        }
+                    }
+                } catch (e) {
+                    console.log(e);
+                }
+            });
+
+            //작업자추가 버튼 클릭
+            $('#btnAddEmployee').click(function () {
+
+                if (treeSelectedRow) {
+                    var vv = $('#gridContainer03').dxDataGrid('instance').getDataSource();
+                    Popup_PermissionEmployeeAdd(treeSelectedRow.selectedRowsData[0].MenuCode, vv.items());
+                }
+            });
+
+            //작업자삭제 버튼 클릭
+            $('#btnRemoveEmployee').click(function () {
+
+                try {
+                    if (treeSelectedRow) {
+                        var pids = $('#gridContainer03').dxDataGrid('instance').getSelectedRowsData();
+                        if (pids.length > 0) {
+                            if (SetCOW_PermissionEmployeeRemoveSave(treeSelectedRow.selectedRowsData[0].MenuCode, pids)) {
+                                var orders = new DevExpress.data.CustomStore({
+                                    load: function (loadOptions) {
+                                        var deferred = $.Deferred(),
+                                            args = {};
+
+                                        if (loadOptions.sort) {
+                                            args.orderby = loadOptions.sort[0].selector;
+                                            if (loadOptions.sort[0].desc)
+                                                args.orderby += " desc";
+                                        }
+
+                                        $.ajax({
+                                            url: "../System/GetCOW_PermissionEmployeeInquiry?menuCode=" + treeSelectedRow.selectedRowsData[0].MenuCode,
+                                            dataType: "json",
+                                            data: args,
+                                            success: function (result) {
+                                                deferred.resolve(result.data);
+                                            },
+                                            error: function (e) {
+                                                console.log("오류발생");
+                                                console.log(e);
+                                                deferred.reject("Data Loading Error");
+                                            },
+                                            timeout: 10000
+                                        });
+                                        return deferred.promise();
+                                    }
+                                });
+                                $("#gridContainer03").dxDataGrid({
+                                    dataSource: {
+                                        store: orders
+                                    }
+                                }).dxDataGrid("instance").refresh();
+                            }
+                        }
+                    }
+                } catch (e) {
+                    console.log(e);
+                }
+            });
+
+            //중복?
+            //$('#btnReadRoleAdd').click(function () {
+            //});
+
+            //추가 권한 추가
+            function SetCOW_PermissionRoleCreateSave(pmenuCode, pids) {
+                try
+                {
+                    var dat = "";
+                    for (var i = 0; i < pids.length; i++) {
+                        dat += pids[i].RoleId + ',';
+                    }
+
+                    $.post('../System/SetCOW_PermissionRoleCreateSave', { menuCode: pmenuCode, ids: dat }, function (data) {
+
+                    }).fail(function (jqXHR, textStatus, errorThrown) {
+                        alert('Error getting products!');
+                    });
+                    return true;
+                } catch (e) {
+                    return false;
+                }
+            }
+
+            //읽기 권한 추가
+            function SetCOW_PermissionRoleReadSave(pmenuCode, pids) {
+                try{
+                    var dat = "";
+                    for (var i = 0; i < pids.length; i++) {
+                        dat += pids[i].RoleId + ',';
+                    }
+                    $.post('../System/SetCOW_PermissionRoleReadSave', { menuCode: pmenuCode, ids: dat }, function (data) {
+
+                    }).fail(function (jqXHR, textStatus, errorThrown) {
+                        alert('Error getting products!');
+                    });
+                    return true;
+                } catch (e) {
+                    return false;
+                }
+            }
+
+            //수정 권한 추가
+            function SetCOW_PermissionRoleUpdateSave(pmenuCode, pids) {
+                try {
+                    var dat = "";
+                    for (var i = 0; i < pids.length; i++) {
+                        dat += pids[i].RoleId + ',';
+                    }
+                    $.post('../System/SetCOW_PermissionRoleUpdateSave', { menuCode: pmenuCode, ids: dat }, function (data) {
+
+                    }).fail(function (jqXHR, textStatus, errorThrown) {
+                        alert('Error getting products!');
+                    });
+                    return true;
+                } catch (e) {
+                    return false;
+                }
+            }
+
+            //삭제 권한 추가
+            function SetCOW_PermissionRoleDeleteSave(pmenuCode, pids) {
+                try {
+                    var dat = "";
+                    for (var i = 0; i < pids.length; i++) {
+                        dat += pids[i].RoleId + ',';
+                    }
+                    $.post('../System/SetCOW_PermissionRoleDeleteSave', { menuCode: pmenuCode, ids: dat }, function (data) {
+
+                    }).fail(function (jqXHR, textStatus, errorThrown) {
+                        alert('Error getting products!');
+                    });
+                    return true;
+                } catch (e) {
+                    return false;
+                }
+            }
+
+            //권한없음 처리
+            function SetCOW_PermissionRoleNoAuthSave(pmenuCode, pids) {
+                try {
+                    var dat = "";
+                    for (var i = 0; i < pids.length; i++) {
+                        dat += pids[i].RoleId + ',';
+                    }
+                    $.post('../System/SetCOW_PermissionRoleNoAuthSave', { menuCode: pmenuCode, ids: dat }, function (data) {
+
+                    }).fail(function (jqXHR, textStatus, errorThrown) {
+                        alert('Error getting products!');
+                    });
+                    return true;
+                } catch (e) {
+                    return false;
+                }
+            }
+
+            //권한 추가?
+            function SetCOW_PermissionRoleAddSave(pmenuCode, pids) {
+                try {
+                    var dat = "";
+                    $.post('../System/SetCOW_PermissionRoleAddSave', { menuCode: pmenuCode, ids: dat }, function (data) {
+
+                    }).fail(function (jqXHR, textStatus, errorThrown) {
+                        alert('Error getting products!');
+                    });
+                    return true;
+                } catch (e) {
+                    return false;
+                }
+            }
+
+            //권한삭제 처리
+            function SetCOW_PermissionRoleRemoveSave(pmenuCode, pids) {
+                try {
+                    var dat = "";
+                    for (var i = 0; i < pids.length; i++) {
+                        dat += pids[i].RoleId + ',';
+                    }
+                    $.post('../System/SetCOW_PermissionRoleRemoveSave', { menuCode: pmenuCode, ids: dat }, function (data) {
+
+                    }).fail(function (jqXHR, textStatus, errorThrown) {
+                        alert('Error getting products!');
+                    });
+                    return true;
+                } catch (e) {
+                    return false;
+                }
+            }
+
+            //선택된 작업자 추가 권한 부여
+            function SetCOW_PermissionEmployeeCreateSave(pmenuCode, pids) {
+                try {
+                    var dat = "";
+                    for (var i = 0; i < pids.length; i++) {
+                        dat += pids[i].EmployeeId + ',';
+                    }
+                    $.post('../System/SetCOW_PermissionEmployeeCreateSave', { menuCode: pmenuCode, ids: dat }, function (data) {
+
+                    }).fail(function (jqXHR, textStatus, errorThrown) {
+                        alert('Error getting products!');
+                    });
+                    return true;
+                } catch (e) {
+                    return false;
+                }
+            }
+
+            //선택된 작업자 읽기 권한 부여
+            function SetCOW_PermissionEmployeeReadSave(pmenuCode, pids) {
+                try {
+                    var dat = "";
+                    for (var i = 0; i < pids.length; i++) {
+                        dat += pids[i].EmployeeId + ',';
+                    }
+                    $.post('../System/SetCOW_PermissionEmployeeReadSave', { menuCode: pmenuCode, ids: dat }, function (data) {
+
+                    }).fail(function (jqXHR, textStatus, errorThrown) {
+                        alert('Error getting products!');
+                    });
+                    return true;
+                } catch (e) {
+                    return false;
+                }
+            }
+
+            //선택된 작업자 수정 권한 부여
+            function SetCOW_PermissionEmployeeUpdateSave(pmenuCode, pids) {
+                try {
+                    var dat = "";
+                    for (var i = 0; i < pids.length; i++) {
+                        dat += pids[i].EmployeeId + ',';
+                    }
+                    $.post('../System/SetCOW_PermissionEmployeeUpdateSave', { menuCode: pmenuCode, ids: dat }, function (data) {
+
+                    }).fail(function (jqXHR, textStatus, errorThrown) {
+                        alert('Error getting products!');
+                    });
+                    return true;
+                } catch (e) {
+                    return false;
+                }
+            }
+
+            //선택된 작업자 삭제
+            function SetCOW_PermissionEmployeeDeleteSave(pmenuCode, pids) {
+                try {
+                    var dat = "";
+                    for (var i = 0; i < pids.length; i++) {
+                        dat += pids[i].EmployeeId + ',';
+                    }
+                    $.post('../System/SetCOW_PermissionEmployeeDeleteSave', { menuCode: pmenuCode, ids: dat }, function (data) {
+
+                    }).fail(function (jqXHR, textStatus, errorThrown) {
+                        alert('Error getting products!');
+                    });
+                    return true;
+                } catch (e) {
+                    return false;
+                }
+            }
+
+            //선택된 작업자 권한없음 처리
+            function SetCOW_PermissionEmployeeNoAuthSave(pmenuCode, pids) {
+                try {
+                    var dat = "";
+                    for (var i = 0; i < pids.length; i++) {
+                        dat += pids[i].EmployeeId + ',';
+                    }
+                    $.post('../System/SetCOW_PermissionEmployeeNoAuthSave', { menuCode: pmenuCode, ids: dat }, function (data) {
+
+                    }).fail(function (jqXHR, textStatus, errorThrown) {
+                        alert('Error getting products!');
+                    });
+                    return true;
+                } catch (e) {
+                    return false;
+                }
+            }
+
+            //작업자 추가??
+            //function SetCOW_PermissionEmployeeAddSave(pmenuCode, pids) {
+            //    try {
+            //        var dat = "";
+            //        $.post('../System/SetCOW_PermissionEmployeeAddSave', { menuCode: pmenuCode, ids: dat }, function (data) {
+
+            //        }).fail(function (jqXHR, textStatus, errorThrown) {
+            //            alert('Error getting products!');
+            //        });
+            //        return true;
+            //    } catch (e) {
+            //        return false;
+            //    }
+            //}
+
+            //선택된 작업자 삭제
+            function SetCOW_PermissionEmployeeRemoveSave(pmenuCode, pids) {
+                try {
+                    var dat = "";
+                    for (var i = 0; i < pids.length; i++) {
+                        dat += pids[i].EmployeeId + ',';
+                    }
+                    $.post('../System/SetCOW_PermissionEmployeeRemoveSave', { menuCode: pmenuCode, ids: dat }, function (data) {
+
+                    }).fail(function (jqXHR, textStatus, errorThrown) {
+                        alert('Error getting products!');
+                    });
+                    return true;
+                } catch (e) {
+                    return false;
+                }
+            }
+
+            //역할추가 팝업 Load
+            function Popup_PermissionRoleAdd(pmenuCode, pids) {
+                var dat = "";
+                for (var i = 0; i < pids.length; i++) {
+                    dat += pids[i].RoleId + ',';
+                }
+                console.log(pids);
+                $.post('../System/Popup_PermissionRoleAdd', { menuCode: pmenuCode, ids: dat }, function (data) {
+                    $('#Modals').html(data);
+
+                }).fail(function (jqXHR, textStatus, errorThrown) {
+                    alert('Error getting products!');
+                });
+                return;
+            }
+
+
+            //역할추가 팝업창 사라지면 재조회
+            $('#Modals').on('hidden.bs.modal', function () {
+                if (treeSelectedRow) {
+                    var orders = new DevExpress.data.CustomStore({
+                        load: function (loadOptions) {
+                            var deferred = $.Deferred(),
+                                args = {};
+
+                            if (loadOptions.sort) {
+                                args.orderby = loadOptions.sort[0].selector;
+                                if (loadOptions.sort[0].desc)
+                                    args.orderby += " desc";
+                            }
+
+                            $.ajax({
+                                url: "../System/GetCOW_PermissionRoleInquiry?menuCode=" + treeSelectedRow.selectedRowsData[0].MenuCode,
+                                dataType: "json",
+                                data: args,
+                                success: function (result) {
+                                    deferred.resolve(result.data);
+                                },
+                                error: function (e) {
+                                    console.log("오류발생");
+                                    console.log(e);
+                                    deferred.reject("Data Loading Error");
+                                },
+                                timeout: 10000
+                            });
+                            return deferred.promise();
+                        }
+                    });
+                    $("#gridContainer02").dxDataGrid({
+                        dataSource: {
+                            store: orders
+                        }
+                    }).dxDataGrid("instance").refresh();
+                }
+            })
+
+
+            //작업자추가 팝업창 Load
+            function Popup_PermissionEmployeeAdd(pmenuCode, pids) {
+                var dat = "";
+                for (var i = 0; i < pids.length; i++) {
+                    dat += pids[i].EmployeeId + ',';
+                }
+                $.post('../System/Popup_PermissionEmployeeAdd', { menuCode: pmenuCode, ids: dat }, function (data) {
+                    $('#ModalsEmployee').html(data);
+
+                }).fail(function (jqXHR, textStatus, errorThrown) {
+                    alert('Error getting products!');
+                });
+                return;
+            }
+
+
+            //작업자추가 팝업창이 사라지면 재조회
+            $('#ModalsEmployee').on('hidden.bs.modal', function () {
+                if (treeSelectedRow) {
+                    var orders = new DevExpress.data.CustomStore({
+                        load: function (loadOptions) {
+                            var deferred = $.Deferred(),
+                                args = {};
+
+                            if (loadOptions.sort) {
+                                args.orderby = loadOptions.sort[0].selector;
+                                if (loadOptions.sort[0].desc)
+                                    args.orderby += " desc";
+                            }
+
+                            $.ajax({
+                                url: "../System/GetCOW_PermissionEmployeeInquiry?menuCode=" + treeSelectedRow.selectedRowsData[0].MenuCode,
+                                dataType: "json",
+                                data: args,
+                                success: function (result) {
+                                    deferred.resolve(result.data);
+                                },
+                                error: function (e) {
+                                    console.log("오류발생");
+                                    console.log(e);
+                                    deferred.reject("Data Loading Error");
+                                },
+                                timeout: 10000
+                            });
+                            return deferred.promise();
+                        }
+                    });
+                    $("#gridContainer03").dxDataGrid({
+                        dataSource: {
+                            store: orders
+                        }
+                    }).dxDataGrid("instance").refresh();
+                }
+            });
+
+        });
+    </script>
+}
+
+

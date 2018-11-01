@@ -1,0 +1,179 @@
+﻿@using RecoWeb.Domain.LocalResource
+
+<div class="col-lg-5 col-md-5 h-100">
+    <div class="ibox">
+        <div class="ibox-title">
+            <span style="font-size:1.4rem;"><i class="fa fa-list-alt" aria-hidden="true"></i>&nbsp;LOT리스트</span>
+        </div>
+        <div class="ibox-content">
+            <div id="data-grid-demo">
+                @(Html.DevExtreme().DataGrid()
+                .ID("gridContainer01")
+                .Paging(paging => paging.PageSize(20))
+                .Pager(pager =>
+                {
+                    pager.ShowPageSizeSelector(true);
+                    pager.AllowedPageSizes(new List<int>
+                    { 20, 50, 100, 200, 300, 500 });
+                    pager.ShowInfo(true);
+                })
+                    .Export(e => e.Enabled(true).FileName("ExportTest").AllowExportSelectedData(true))
+                    .ColumnAutoWidth(true)
+                    .ShowColumnLines(true)
+                    .ShowRowLines(true)
+                    .ShowBorders(true)
+                    .OnContentReady("onReady") // 레디 이벤트
+                    .HoverStateEnabled(true)
+                    .Sorting(e => e.Mode(GridSortingMode.Multiple))
+                    .ColumnMinWidth(50)
+                    .AllowColumnResizing(true)
+                    .Option("columnResizingMode", ColumnResizingMode.Widget)
+                    //칼럼이름의 시작에 !, @, -, _를 붙이면 _로 바뀜
+                    .DataSource(ds => ds.Mvc().Controller("Lot").Key("_KeyColumn")
+                    .LoadAction("GetDataLTW_TraceReverseTreeviewLotInquiry")
+                    .LoadParams(new
+                    {
+                        p_PlantId = new JS("getIdValue('Plants')")
+                    ,
+                        p_FactoryId = new JS("getIdValue('Factories')")
+                    ,
+                        p_WorkshopTypeId = new JS("getIdValue('WorkshopTypes')")
+                    ,
+                        p_WorkshopId = new JS("getIdValue('Workshops')")
+                    ,
+                        p_WorkDate = new JS("getIdValue('startDate')")
+                    ,
+                        p_PaletteLotId = new JS("getIdValue('PaletteLotNo')")
+                    ,
+                        p_LotId = new JS("getIdValue('LotNo')")
+                    ,
+                        p_PaletteTagId = new JS("getIdValue('RfTagNo')")
+                    ,
+                        p_UserId = ""
+                    })
+                    )
+                    .Columns(columns =>
+                    {
+                        columns.Add().DataField("WorkDate").Caption("작업일").Alignment(HorizontalAlignment.Center);
+                        columns.Add().DataField("PartCode").Caption("품번").Alignment(HorizontalAlignment.Left);
+                        columns.Add().DataField("Palette_Lot").Caption("팔레트LOT").Alignment(HorizontalAlignment.Left);
+                        columns.Add().DataField("Lot").Caption("LOT").Alignment(HorizontalAlignment.Center);
+                        columns.Add().DataField("Palette_Tag").Caption("팔래트태그").Alignment(HorizontalAlignment.Center);
+                        columns.Add().DataField("WorkshopName").Caption("작업장명").Alignment(HorizontalAlignment.Left).Visible(false);
+                        columns.Add().DataField("_IsMetalPrint").Caption("출력유무").Alignment(HorizontalAlignment.Left).Visible(false);
+                        columns.Add().DataField("_PaletteTagId").Caption("팔레트태그아디").Alignment(HorizontalAlignment.Left).Visible(false);
+                        columns.Add().DataField("_PartId").Caption("품번아디").Alignment(HorizontalAlignment.Left).Visible(false);
+                        columns.Add().DataField("_LotTransId").Caption("LOT트랜스").Alignment(HorizontalAlignment.Left).Visible(false);
+                        columns.Add().DataField("_PaletteLotTransId").Caption("팔레트트랜스").Alignment(HorizontalAlignment.Left).Visible(false);
+                        columns.Add().DataField("_KeyColumn").Caption("키").Alignment(HorizontalAlignment.Left).Visible(false);
+                        columns.Add().DataField("_PARAM").Caption("파라미터").Alignment(HorizontalAlignment.Left).Visible(false);
+                    })
+                    .OnSelectionChanged("grid1Change") //체인지 이벤트를 선언함
+                    .Height(new JS("heightCalc(' 100')"))
+                    .Selection(e =>
+                    e.Mode(SelectionMode.Single))
+                )
+
+
+                @*<table id="TCI-Grid1" cellpadding="0" cellspacing="0"></table>
+                <div id="TCI-Pager1" style="text-align: center;">
+                </div>*@
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="col-lg-7 col-md-7 h-100">
+    <div>
+        <div class="ibox">
+            <div class="ibox-title">
+                <span style="font-size:1.4rem;"><i class="fa fa-list-ul" aria-hidden="true"></i>&nbsp;LOT트리뷰</span>
+            </div>
+            <div class="ibox-content">
+                @(Html.DevExtreme().TreeList()
+                    .ID("gridContainer02")
+                    .KeyExpr("PartId")
+                    .ParentIdExpr("ParentPartId")
+                    .Columns(columns =>
+                    {
+                        columns.Add().DataField("PartCode").Caption("품번").Alignment(HorizontalAlignment.Left);
+                        columns.Add().DataField("PartName").Caption("품명").Alignment(HorizontalAlignment.Left);
+                        columns.Add().DataField("LotId").Caption("LOT").Alignment(HorizontalAlignment.Left);
+                        columns.Add().DataField("LotQty").Caption("수량").Alignment(HorizontalAlignment.Right);
+                        columns.Add().DataField("PartTypeName").Caption("종류").Alignment(HorizontalAlignment.Center);
+
+                        columns.Add().DataField("WorkDate").Caption("WorkDate").Visible(false);
+                        columns.Add().DataField("InputTime").Caption("InputTime").Visible(false);
+                        columns.Add().DataField("DelvTime").Caption("DelvTime").Visible(false);
+                    })
+                    .ShowRowLines(true)
+                    .ShowColumnLines(true)
+                    .ShowBorders(true)
+                    .ColumnAutoWidth(true)
+                    .ExpandedRowKeys(new[] { 1 })
+                    .HoverStateEnabled(true)
+                    .Selection(e =>e.Mode(SelectionMode.Single))
+                )
+            </div>
+        </div>
+    </div>
+
+
+</div>
+
+
+<script type="text/javascript">
+    //그리드 Load이후 타는 이벤트
+    function onReady(a) {
+        if ($('#gridContainer01').dxDataGrid("instance").totalCount() > 0) {
+            $('#gridContainer01').dxDataGrid("instance").selectRowsByIndexes(0);
+            //↑ 동일함. (↓더 많은 테스트는 진행못함)
+            //$('#' + a.element[0].id).dxDataGrid("instance").selectRows(1)
+        }
+    }
+    var akjvna;
+    function grid1Change(selectedRow) {
+        try {
+            akjvna = selectedRow;
+            var orders = new DevExpress.data.CustomStore({
+                load: function (loadOptions) {
+                    var deferred = $.Deferred(),
+                        args = {};
+
+                    if (loadOptions.sort) {
+                        args.orderby = loadOptions.sort[0].selector;
+                        if (loadOptions.sort[0].desc)
+                            args.orderby += " desc";
+                    }
+
+                    $.ajax({
+                        url: "../Lot/GetDataLTW_TraceReverseTreeviewInquiry?p_PartId=" + selectedRow.selectedRowsData[0]._PartId + "&p_LotTransId=" + selectedRow.selectedRowsData[0]._LotTransId + "&p_PaletteLotTransId=" + selectedRow.selectedRowsData[0]._PaletteLotTransId,
+                        dataType: "json",
+                        data: args,
+                        success: function (result) {
+                            deferred.resolve(result.data);
+                            a = result;
+                            console.log(result.data);
+                        },
+                        error: function (e) {
+                            console.log("onReadyError");
+                            console.log(e);
+                            deferred.reject("Data Loading Error");
+                        },
+                        timeout: 10000
+                    });
+                    return deferred.promise();
+                }
+            });
+            $("#gridContainer02").dxTreeList({
+                dataSource: {
+                    store: orders
+                }
+            }).dxTreeList("instance").refresh();
+        }
+        catch (e) {
+            console.log(e);
+        }
+    }   
+
+</script>

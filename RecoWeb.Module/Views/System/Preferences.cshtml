@@ -1,0 +1,203 @@
+﻿@model RecoWeb.Module.Models.PreferencesViewModel
+@using RecoWeb.Domain.LocalResource
+
+<div id="Context" class="row wrapper wrapper-content animated fadeInRight">
+    <div class="col-lg-3 col-md-3">
+        @using (Html.BeginForm("TitleSave", "System", new { title = Model.Title }, FormMethod.Get, new { role = "form" }))
+        {
+            <div class="ibox">
+                <div class="ibox-title">
+                    <span style="font-size:1.4rem;"><i class="fa fa-list-alt" aria-hidden="true"></i>&nbsp;사이트정보</span>
+                </div>
+                <div class="ibox-content">
+                    <p>사이트명:</p>
+                    @Html.TextBoxFor(x => x.Title)
+                    <button type="submit" class="btn btn-primary">
+                        저장
+                    </button>
+                </div>
+
+            </div>
+        }
+
+    </div>
+
+    <div class="col-lg-3 col-md-3">
+        @using (Html.BeginForm("RecentVisitSave", "System", new { title = Model.RecentVisit }, FormMethod.Get, new { role = "form" }))
+        {
+            <div class="ibox">
+                <div class="ibox-title">
+                    <span style="font-size:1.4rem;"><i class="fa fa-list-ul" aria-hidden="true"></i>&nbsp;화면정보</span>
+                </div>
+                <div class="ibox-content">
+                    <p>최근 방문 페이지 개수:</p>
+                    @Html.TextBoxFor(x => x.RecentVisit)
+                    <button type="submit" class="btn btn-primary">
+                        저장
+                    </button>
+                </div>
+            </div>
+        }
+    </div>
+    <div class="col-lg-3 col-md-3">
+
+        @*배포시 Footer Fixed의 초기값은 반드시 false로 해야함.*@
+        @*└> 이유: true/false로 변경시에 fixed라는 클래스를 추가/제거해주는 구문이 들어감.*@
+        @using (Html.BeginForm("FooterFixedSave", "System", new { title = Model.isFooterFixed }, FormMethod.Get, new { role = "form" }))
+        {
+            <div class="ibox">
+                <div class="ibox-title">
+                    <span style="font-size:1.4rem;"><i class="fa fa-list-ul" aria-hidden="true"></i>&nbsp;설정</span>
+                </div>
+                <div class="ibox-content">
+                    <p>Footer Fixed:</p>
+                    @Html.CheckBoxFor(x => x.isFooterFixed, new { @data_toggle = "toggle", @data_on = "Yes", @data_off = "No", @checked = true, @data_size = "normal" })
+                    <input type="submit" id="footer-save" class="btn btn-primary" value="저장" />
+                </div>
+            </div>
+        }
+    </div>
+    <div class="col-lg-3 col-md-3">
+        <div>
+            @using (Html.BeginForm("BackgoundSave", "System", FormMethod.Post, new { id = "form-Background" }))
+            {
+                <div class="ibox">
+                    <div class="ibox-title">
+                        <span style="font-size:1.4rem;"><i class="fa fa-list-ul" aria-hidden="true"></i>&nbsp;로그인화면</span>
+                    </div>
+                    <div class="ibox-content">
+                        <p>로그인화면 설정</p>
+                        <div style="display:flex;">
+                            <input type="file" id="background-files" class="backgound-file" name="postedFile">
+                            <input type="button" id="background-save" class="btn btn-primary" value="저장" />
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <link href="@Url.Action("plugins/bootstrap-toggle/bootstrap-toggle.min.css", "Content")" rel="stylesheet" type="text/css" />
+    <link href="@Url.Action("plugins/sweetalert/sweetalert.css", "Content")" rel="stylesheet" type="text/css" />
+
+}
+
+@section Scripts {
+    <script src="../Scripts/jquery-3.1.1.min.js"></script>
+    <script src="../Scripts/plugins/bootstrap-toggle/bootstrap-toggle.min.js" type="text/javascript"></script>
+    <script src="../Scripts/plugins/sweetalert/sweetalert.min.js" type="text/javascript"></script>
+
+
+    <script type="text/javascript">
+        $().ready(function () {
+
+            //Footer Fixed Toggle 이벤트
+            $('#isFooterFixed').on('change', function () {
+                $('#isFooterFixed').val($(this).prop('checked'));
+            });
+            //Footer Fixed 저장버튼 클릭
+            $('#footer-save').on('click', function () {
+                if ($('#isFooterFixed').prop('checked')) {
+                    console.log('on');
+                    localStorage.setItem('fixedfooter', 'on');
+                } else {
+                    console.log('off');
+                    localStorage.setItem('fixedfooter', 'off');
+                }
+            });
+
+            //배경화면 저장버튼 클릭
+            $('#background-save').on("click", function () {
+                var filesss = $(".backgound-file")[0];
+                if (filesss !== undefined) {
+                    var filea = filesss.files[0];
+
+                    if (filea == undefined) {
+                        swal({
+                            title: "알림",
+                            text: "파일을 선택하세요.",
+                            type: "warning"
+                        });
+                        return;
+                    }
+                    if (filea.size > 20971520) {
+                        swal({
+                            title: "알림",
+                            text: "파일 크기는 20MB이하 입니다.",
+                            type: "warning"
+                        });
+                        return;
+                    }
+                    var imgTypes, inputFileName;
+                    inputFileName = filesss.files[0].name;
+                    if (inputFileName.split('.').length != 2) {
+                        swal({
+                            title: "알림",
+                            text: "파일 이름이 잘못되었습니다.",
+                            type: "warning"
+                        });
+                        return;
+                    }
+
+                    imgTypes = inputFileName.split('.')[1];
+                    if (imgTypes != 'jpg' && imgTypes != 'jepg' && imgTypes != 'png' && imgTypes != 'gif' && imgTypes != 'bmp') {
+                        swal({
+                            title: "알림",
+                            text: "파일을 형식이 잘못되었습니다.",
+                            type: "warning"
+                        });
+                        return;
+                    }
+
+                    var reader = new FileReader();
+                    reader.readAsDataURL(filea);
+                    reader.onload = function () {
+                        result = reader.result;
+                        result = result.replace(/\+/g, '_');
+
+                        $.ajax({
+                            url: '../System/BackgoundSave',
+
+                            //파일 이름은 index.jpg로 고정
+                            data: "&fileData=" + result + "&file=" + "index.jpg",
+
+                            processData: false,
+                            contentType: "application/x-www-form-urlencoded; charset=UTF-8",
+                            type: 'POST',
+                            success: function (data) {
+                                swal({
+                                    title: "알림",
+                                    text: "업로드 완료",
+                                    type: "success",
+                                    showCancelButton: false,
+                                    confirmButtonClass: "confirm",
+                                    confirmButtonText: "OK",
+                                    closeOnConfirm: false
+                                }, function (isConfirm) {
+                                    //성공시 새로고침
+                                    if (isConfirm) {
+                                        location.reload(true);
+                                    }
+                                });
+
+                            },
+                            error: function (request, status, error) {
+                                console.log("code:" + request.status + "\n" + "message:" + request.responseText + "\n" + "error:" + error);
+                                swal({
+                                    title: "알림",
+                                    text: "업로드 실패",
+                                    type: "error"
+                                });
+                                return;
+                            }
+                        });
+                    }
+                }
+            });
+
+        });
+
+    </script>
+}

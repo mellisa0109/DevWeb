@@ -1,0 +1,131 @@
+﻿@model RecoWeb.Module.Models.PermissionViewModel
+
+<div class="modal-dialog modal-lg" onload="Loads()" id="Modals">
+
+    <div class="modal-content animated fadeInRight">
+        <div class="col-lg-7 col-md-7 h-100">
+            <div>
+                <div class="ibox">
+                    <div class="ibox-title">
+                        <span style="font-size:1.4rem;"><i class="fa fa-list-ul" aria-hidden="true"></i>&nbsp;역할추가</span>
+                        <span class="pull-right">
+                            <button type="button" class="btn btn-default ibox-title-btn" id="btnReadRoleAdd">읽기</button>
+                            <button type="button" class="btn btn-default ibox-title-btn" id="btnAllRoleAdd">읽기+추가+수정+삭제</button>
+                            <button type="button" class="btn btn-default ibox-title-btn" id="btnNoAuthRoleAdd">권한없음</button>
+                        </span>
+
+                    </div>
+                    <div class="ibox-content modal-body">
+                        <table id="TCI-Grid4" cellpadding="0" cellspacing="0"></table>
+                        <div id="TCI-Pager4" style="text-align: center;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            showGrid10('@Model.MenuCode', '@Model.Ids');
+        })
+
+        var row_grid2;
+        function showGrid10(menuCode, Ids) {
+            //그리드 선언
+            $("#TCI-Grid4").jqGrid
+             ({
+                 url: '../System/GetCOW_PermissionRoleAddInquiry',
+                 datatype: 'json',
+                 mtype: 'GET',
+                 //파라메타
+                 postData: {
+                     //menuCode: $(".check-item input[name='menuCode']").val()
+                     menuCode: menuCode
+                     , ids: Ids
+                 },
+                 hidegrid: true,
+                 loadonce: true, 
+                 navOptions: { reloadGridOptions: { fromServer: true } },
+                 loadtext: 'Loading...',
+                 rownumbers: true,
+                 shrinkToFit: true,
+                 colNames: ['역할코드', '역할이름'],
+                 colModel: [
+                    {
+                        key: true,
+                        name: 'RoleId',
+                        index: 'RoleId',
+                        width: '200%'
+                        , hidden: false, editable: true
+                    }, {
+                        key: false,
+                        name: 'RoleName',
+                        index: 'RoleName',
+                        width: '250%'
+                        , hidden: false, editable: true
+                    }
+                 ],
+                 pager: jQuery('#TCI-Pager4'),
+                 rowNum: 100,
+                 rowList: [20, 50, 100, 200, 300, 500],
+                 height: '100%',
+                 viewrecords: true,
+                 emptyrecords: 'No records to display',
+                 autowidth: true,
+                 multiselect: true
+             }).navGrid('#TCI-Pager4',
+             {
+                 edit: false,
+                 add: false,
+                 del: false,
+                 search: false,
+                 refresh: false
+             });
+        }
+
+        $('#btnReadRoleAdd').click(function () {
+            var pids = $("#TCI-Grid4").getGridParam('selarrrow'); // 선택된 행을 가지고 온다
+            SetCOW_PermissionRoleAddSave('@Model.MenuCode', pids, '0', '1', '0', '0');
+
+            $('#Modals').modal('hide')
+        });
+
+        $('#btnAllRoleAdd').click(function () {
+            var pids = $("#TCI-Grid4").getGridParam('selarrrow'); // 선택된 행을 가지고 온다
+            SetCOW_PermissionRoleAddSave('@Model.MenuCode', pids, '1', '1', '1', '1');
+
+            $('#Modals').modal('hide')
+        });
+
+        $('#btnNoAuthRoleAdd').click(function () {
+            var pids = $("#TCI-Grid4").getGridParam('selarrrow'); // 선택된 행을 가지고 온다
+            SetCOW_PermissionRoleAddSave('@Model.MenuCode', pids, '0', '0', '0', '0');
+
+            $('#Modals').modal('hide')
+        });
+
+        function SetCOW_PermissionRoleAddSave(pmenuCode, pids, pauthCreate, pauthRead, pauthUpdate, pauthDelete) {
+            var dat = "";
+            for (var i = 0; i < pids.length; i++) {
+                dat += pids[i] + ',';
+            }
+
+            $.post('../System/SetCOW_PermissionRoleAddSave', {
+                menuCode: pmenuCode
+                , ids: dat
+                , authCreate: pauthCreate
+                , authRead: pauthRead
+                , authUpdate: pauthUpdate
+                , authDelete: pauthDelete
+            }, function (data) {
+
+            }).fail(function (jqXHR, textStatus, errorThrown) {
+                alert('Error getting products!');
+            });
+            return;
+        }
+    </script>

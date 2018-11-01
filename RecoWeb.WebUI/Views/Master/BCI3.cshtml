@@ -1,0 +1,480 @@
+﻿@model RecoWeb.WebUI.Models.TQW_TCIViewModel
+@using RecoWeb.Domain.LocalResource
+
+@{
+
+    AjaxOptions ajaxInquiry = new AjaxOptions
+    {
+        HttpMethod = "GET",
+        InsertionMode = InsertionMode.Replace,
+        OnSuccess = "ContextInquiry",
+        UpdateTargetId = "Context"
+
+    };
+}
+@*actionName을 가지고 AjaxInquiryContextMenu에
+        파라미터로 넘겨주고 비교해 불러올 partialView를 선택하고싶었습니다..T-T 아래와 같은 파라미터를 써서..
+    , new { ccc = "SIS" }*@
+@using (Ajax.BeginForm("AjaxInquiryContextMenu2", "Master", ajaxInquiry, new { @class = "form-horizontal" }))
+{
+    <div class="row wrapper white-bg page-heading">
+        <div class="col-lg-8 col-md-8 col-xs-12" style="display:flex;">
+            <span style="float:left; padding:0.6rem; font-size:14px;">
+                <i class="fa fa-th" aria-hidden="true"></i>
+            </span>
+            <div style="align-self:flex-end; padding:0.6rem">
+
+                <ol class="breadcrumb" style="font-size:14px;">
+                    @foreach (var page in Model.MenuLocation)
+                    {
+                        if (page == Model.ActivePage)
+                        {
+                            <li class="active">
+                                <strong>@Model.resourceManager.String("Menu_" + @page) </strong>
+                            </li>
+                        }
+                        else
+                        {
+                            <li>
+                                <span>@Model.resourceManager.String("Menu_" + @page)</span>
+                            </li>
+                        }
+                    }
+                </ol>
+            </div>
+        </div>
+
+        @*<span class="col-lg-3 col-md-3 col-xs-3" style="margin-top: 0.5rem;">*@
+        <div class="col-lg-4 col-md-4">
+            <div class="pull-right">
+                <button class="btn bg-primary mr-3" id="btnUpload" name="upload" value="Upload" data-toggle="modal" data-target="#ExcelUploadModal"><i class="fa fa-check"></i>&nbsp;@Resource.CheckItemUpload</button>
+                <button class="btn bg-primary mr-4" id="btnDownload" name="download" value="Download" onclick="location.href='@Url.Action("AjaxChecksheetItemDownload", "Master")'"><i class="fa fa-check"></i>&nbsp;@Resource.UploadDocument</button>
+                @using (Ajax.BeginForm("AjaxInquiryContextMenu2", "Master", ajaxInquiry, new { @style = "display: inline" }))
+                {
+                    <button class="btn bg-primary" name="inquiry" type="submit" value="Inquiry" id="btn-find"><i class="fa fa-check"></i>&nbsp;@Resource.Inquiry</button>
+                }
+            </div>
+        </div>
+        @*</span>*@
+    </div>
+}
+<div class="modal inmodal fade" id="ExcelUploadModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+
+        <div class="modal-content animated fadeInRight">
+            @*로딩화면*@
+            <div class="sk-spinner sk-spinner-wave">
+                <div class="sk-rect1"></div>
+                <div class="sk-rect2"></div>
+                <div class="sk-rect3"></div>
+                <div class="sk-rect4"></div>
+                <div class="sk-rect5"></div>
+            </div>
+            @*팝업 타이틀*@
+            <div class="modal-header">
+                <button type="button" class="close upload-close" data-dismiss="modal">
+                    <i class="fa fa-times" aria-hidden="true"></i>
+                </button>
+
+                <h6 class="modal-title">검사항목 업로드</h6>
+
+            </div>
+            @*팝업 내용*@
+            @Html.Partial("_BCI3ExcelUpload")
+            @*팝업 버튼들..*@
+            <div class="modal-footer">
+                <button type="button" class="btn bg-primary upload-close" data-dismiss="modal">닫기</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row wrapper border-bottom white-bg check-item">
+    <div class="btn-group">
+
+        <span class="mr-3">
+            <label class="filter-title mr-1">플랜트:</label>
+            @Html.DropDownListFor(x => x.COW_FilterPlantInquiry.FirstOrDefault().PlantName,
+                                        new SelectList(Model.COW_FilterPlantInquiry.Select(s => new SelectListItem { Value = s.PlantId, Text = s.PlantName }), "Value", "Text")
+                                        , new { @class = "reco-width-M filter-item", @id = "Plants" })
+        </span>
+        <span class="mr-3">
+            <label class="filter-title mr-1">공장동:</label>
+            @Html.DropDownListFor(x => x.COW_FilterFactoriesInquiry.FirstOrDefault().FactoryName,
+                                        new SelectList(Model.COW_FilterFactoriesInquiry.Select(s => new SelectListItem { Value = s.FactoryId, Text = s.FactoryName }), "Value", "Text")
+                                        , new { @class = "reco-width-M filter-item", @id = "Factories" })
+        </span>
+        <span class="mr-3">
+            <label class="filter-title mr-1">라인유형 :</label>
+            @Html.DropDownListFor(x => x.COW_FilterWorkshopTypesInquiry.FirstOrDefault().Desc,
+                                        new SelectList(Model.COW_FilterWorkshopTypesInquiry.Select(s => new SelectListItem { Value = s.WorkshopTypeId, Text = s.Desc }), "Value", "Text")
+                                        , new { @class = "reco-width-M filter-item", @id = "WorkshopTypes" })
+        </span>
+        <span class="mr-3">
+            <label class="filter-title mr-1">라인:</label>
+            @Html.DropDownListFor(x => x.COW_FilterWorkshopsInquiry.FirstOrDefault().WorkshopName,
+                                        new SelectList(Model.COW_FilterWorkshopsInquiry.Select(s => new SelectListItem { Value = s.WorkshopId.ToString(), Text = s.WorkshopName }), "Value", "Text")
+                                        , new { @class = "reco-width-M filter-item", @id = "Workshops" })
+        </span>
+        <span class="mr-3">
+            <label class="filter-title mr-1">품번:</label>
+            <input type="text" id="Part" class="filter-item" />
+        </span>
+        <span class="mr-3">
+            <label class="filter-title mr-1">사용여부:</label>
+            <span class="btn-group radios" data-toggle="buttons" style="float:none;">
+                @*<label class="filter-title" class="btn btn-primary">*@
+                @Html.RadioButtonFor(x => x.isUse, Model.isUse == true ? true : false, new { @class = (Model.isUse == true ? "checked=Checked filter-item" : "") }) 사용
+                @*</label>
+                    <label class="filter-title" class="btn btn-primary">*@
+                @Html.RadioButtonFor(x => x.isUse, Model.isUse == false ? true : false, new { @class = (Model.isUse == false ? "checked=Checked filter-item" : "") }) 정지
+                @*</label>*@
+            </span>
+        </span>
+    </div>
+</div>
+
+
+<div id="Context" class="row wrapper wrapper-content animated fadeInRight">
+    @Html.Partial("_BCI3Context")
+</div>
+
+<div class="modal inmodal fade" id="Modals" tabindex="-1" role="dialog" aria-hidden="true">
+    @Html.Partial("_BCI3ImageUpload", Model)
+</div>
+<div id="blueimp-gallery" class="blueimp-gallery">
+    <div class="slides"></div>
+    <h3 class="title"></h3>
+    <a class="prev">‹</a>
+    <a class="next">›</a>
+    <a class="close">×</a>
+    <a class="play-pause"></a>
+    <ol class="indicator"></ol>
+</div>
+<style>
+    /* 갤러리 좌,우,중간 정렬*/
+    .lightBoxGallery {
+        text-align: left;
+    }
+
+    /* 갤러리 이미지들의 간격*/
+    .lightBoxGallery img {
+        margin: 2px 1px;
+    }
+</style>
+
+
+@section Styles {
+    
+    @Styles.Render("~/Content/plugins/jqGrid/jqGridStyles")
+    @Styles.Render("~/Content/plugins/blueimp/css")
+    @Styles.Render("~/plugins/sweetAlertStyles")
+}
+
+@section Scripts {
+    <script src="~/Scripts/jquery-3.1.1.min.js"></script>
+    @Scripts.Render("~/plugins/fileSaver")
+    @Scripts.Render("~/plugins/sheetJs")
+    @Scripts.Render("~/plugins/jqGrid")
+    <script src="~/Scripts/app/reco.js"></script>
+    @Scripts.Render("~/plugins/lightboxGallery")
+    @Scripts.Render("~/plugins/sweetAlert")
+
+    <script type="text/javascript">
+
+        //검사항목업로드 버튼
+        $('#btnUpload').on('click', function () {
+            $.ajax({
+                url: '../Master/AjaxChecksheetItemUpload',
+                dataType: 'html',
+                success: function (data) {
+                    $('#myPartialContainer').html(data);
+                }
+            })
+        });
+
+        var fileTarget;
+        var paramsArray = new Array;
+        var selectedParams;
+        //아래의 코드를 주게되면 크롬기준으로 F11(전체화면모드)의 상태로 원본이미지가 팝업됨.
+        //$('#blueimp-gallery').data('fullScreen', 'true');
+        function goPartial(plantId, workshopId, partId, rowId) {
+            selectedParams = paramsArray[rowId];
+
+            $.post('../Master/AjaxInquiryContextMenu4', { plant: plantId, workshop: workshopId, part: partId }, function (data) {
+
+                $('#Modals').html(data);
+
+                fileTarget = $('.filebox').children('.upload-hidden.img-upload');
+                var filename;
+                fileTarget.on('change', function () {
+
+                    // 값이 변경되면
+                    if (window.FileReader) { // modern browser
+                        if ($(this)[0].files.length > 0) {
+                            filename = $(this)[0].files[0].name;
+                        } else {
+                            filename = '';
+                        }
+                    } else { // old IE
+                        filename = $(this).val().split('/').pop().split('\\').pop(); // 파일명만 추출
+                    }
+
+                    // 추출한 파일명 삽입
+                    $(this).siblings('.upload-filename.img-filename').val(filename);
+                    $(this).siblings('.upload-filename.img-filename').attr('disabled', false);
+
+                    var parent = $(this).parent();
+                    parent.children('.upload-display').remove();
+                    if (window.FileReader) { //image 파일만
+                        if (!$(this)[0].files[0].type.match(/image\//)) return;
+                        var reader = new FileReader();
+                        reader.onload = function (e) {
+                            var src = e.target.result;
+                            parent.append('<div class="upload-display"><div class="img-upload-thumb-wrap" onclick="isZoom()"><img src="' + src + '" class="img-upload-thumb"></div></div>');
+                        }
+                        reader.readAsDataURL($(this)[0].files[0]);
+                    } else {
+                        $(this)[0].select();
+                        $(this)[0].blur();
+                        var imgSrc = document.selection.createRange().text;
+                        parent.append('<div class="upload-display"><div class="img-upload-thumb-wrap" onclick="isZoom()"><img class="img-upload-thumb"></div></div>');
+                        var img = $(this).siblings('.upload-display').find('img');
+                        img[0].style.filter = "progid:DXImageTransform.Microsoft.AlphaImageLoader(enable='true',sizingMethod='scale',src=\"" + imgSrc + "\")";
+                    }
+                });
+                $('#label-img-upload').on("click", function () {
+                    var filesss = $(".upload-hidden.img-upload")[0];
+                    if (filesss !== undefined) {
+                        var filea = filesss.files[0];
+
+                        if (filea == undefined) {
+                            swal({
+                                title: "알림",
+                                text: "파일을 선택하세요.",
+                                type: "warning"
+                            });
+                            return;
+                        }
+                        if (filea.size > 20971520) {
+                            swal({
+                                title: "알림",
+                                text: "파일 크기는 20MB이하 입니다.",
+                                type: "warning"
+                            });
+                            return;
+                        }
+                        var imgTypes,inputFileName;
+                        inputFileName = $('.upload-filename.img-filename').val();
+                        if (inputFileName.split('.').length != 2) {
+                            swal({
+                                title: "알림",
+                                text: "파일 이름이 잘못되었습니다.",
+                                type: "warning"
+                            });
+                            return;
+                        }
+
+                        imgTypes = inputFileName.split('.')[1];
+                        if (imgTypes != 'jpg' && imgTypes != 'jepg' && imgTypes != 'png' && imgTypes != 'gif' && imgTypes != 'bmp') {
+                            swal({
+                                title: "알림",
+                                text: "파일을 형식이 잘못되었습니다.",
+                                type: "warning"
+                            });
+                            return;
+                        }
+                        // 정상 로드시 result에 인코딩 값을 저장하기
+                        var reader = new FileReader();
+                        reader.readAsDataURL(filea);
+                        reader.onload = function () {
+                            $('.modal-dialog').children('.modal-content').toggleClass('sk-loading');
+                            result = reader.result;
+                            result = result.replace(/\+/g, '_');
+
+                            $.ajax({
+                                url: "http://192.168.1.5/MesWebService.FileUpload/Service.asmx/SaveWithFileTransfer",
+
+                                //type은 반드시 M으로 해야함.
+                                data: "&fileData=" + result + "&file=" + inputFileName + "&saveLocationFlag=" + "RE" + "&plantId=" + $("#Plants").val() + "&type=" + "M",
+
+                                processData: false,
+                                contentType: "application/x-www-form-urlencoded; charset=UTF-8",
+                                type: 'POST',
+                                success: function (data) {
+                                    $('.modal-dialog').children('.modal-content').toggleClass('sk-loading');
+                                    dataSave(selectedParams[0].split('=')[1], selectedParams[1].split('=')[1], selectedParams[2].split('=')[1], inputFileName);
+                                    //$.post('../Master/ImageSave', { plant: selectedParams[0].split('=')[1], workshop: selectedParams[1].split('=')[1], part: selectedParams[2].split('=')[1], imgName: inputFileName }, function (data) {
+                                    //    console.log("?!!" + data);
+                                    //});
+                                    itemClear();
+                                    swal({
+                                        title: "알림",
+                                        text: "업로드 완료",
+                                        type: "success"
+                                    });
+                                    setTimeout(goPartial(selectedParams[0].split('=')[1], selectedParams[1].split('=')[1], selectedParams[2].split('=')[1], selectedParams[3]), 2000);
+                                    //goPartial(selectedParams[0].split('=')[1], selectedParams[1].split('=')[1], selectedParams[2].split('=')[1], selectedParams[3]);
+                                },
+                                error: function (request, status, error) {
+                                    $('.modal-dialog').children('.modal-content').toggleClass('sk-loading');
+                                    console.log("code:" + request.status + "\n" + "message:" + request.responseText + "\n" + "error:" + error);
+                                    swal({
+                                        title: "알림",
+                                        text: "업로드 실패",
+                                        type: "error"
+                                    });
+                                    return;
+                                }
+                            });
+                        }
+                        // 실패할 경우 에러 출력하기
+                        reader.onerror = function (error) {
+                            $('.modal-dialog').children('.modal-content').toggleClass('sk-loading');
+                            console.log(error);
+                            swal({
+                                title: "알림",
+                                text: "업로드 실패",
+                                type: "error"
+                            });
+                        };
+                    }
+                });
+            }).fail(function (jqXHR, textStatus, errorThrown) {
+                console.log('Error');
+            });
+
+            $('.upload-filename.img-filename').dblclick(function () {
+                if ($(this).attr('disabled')) {
+                    console.log("포커스 줌");
+                    $(this).attr('disabled', false);
+                    $(this).focus();
+                } else {
+                    console.log("포커스 없앰");
+                    $(this).attr('disabled', true);
+                    $(this).blur();
+                }
+            });
+        };
+
+        function ContextInquiry(returnValue) {
+            //console.log("1");
+            //그리드 Row수가 0보다 클 때, 1번째 Row 선택
+            //if ($('#gridContainer01').dxDataGrid("instance").totalCount() > 0) {
+
+            //    //index를 값으로 줌
+            //    $('#gridContainer01').dxDataGrid("instance").selectRowsByIndexes(0);
+
+            //    //키값을 값으로 줌
+            //    //$('#gridContainer01').dxDataGrid("instance").selectRows(1);
+            //}
+        }
+
+
+        var params;
+        
+        $(document).ready(function () {
+
+            $('#btn-find').on('click', function () {
+                if (paramsArray.length > 0) {
+                    paramsArray.splice(0, paramsArray.length);
+                    console.log("배열 초기화");
+                }
+            });
+
+            // Dropdown list change event.
+            $('#Plants').change(function () {
+                $('#Factories option').remove();
+                $('#WorkshopTypes option').remove();
+                $('#Workshops option').remove();
+                $.getJSON('../Common/GetCOW_FilterFactoriesInquiry', { p_PlantId: $('#Plants').val() }, function (data) {
+                    $.each(data, function () {
+                        $('#Factories').append('<option value=' +
+                          this.FactoryId + '>' + this.FactoryName + '</option>');
+                    });
+
+                }).fail(function (jqXHR, textStatus, errorThrown) {
+                    alert('Error getting products!');
+                });
+
+                $.getJSON('../Common/GetCOW_FilterWorkshopTypesInquiry', { p_PlantId: $('#Plants').val() }, function (data) {
+                    $.each(data, function () {
+                        $('#WorkshopTypes').append('<option value=' +
+                          this.WorkshopTypeId + '>' + this.Desc + '</option>');
+                    });
+
+                }).fail(function (jqXHR, textStatus, errorThrown) {
+                    alert('Error getting products!');
+                });
+
+                $.getJSON('../Common/GetCOW_FilterWorkshopsInquiry', { p_PlantId: $('#Plants').val(), p_FactoryId: $('#Factories').val(), p_WorkshopTypeId: $('#WorkshopTypes').val() }, function (data) {
+                    $.each(data, function () {
+                        $('#Workshops').append('<option value=' +
+                          this.WorkshopId + '>' + this.WorkshopName + '</option>');
+                    });
+
+                }).fail(function (jqXHR, textStatus, errorThrown) {
+                    alert('Error getting products!');
+                });
+
+            });
+
+            $('#Factories').change(function () {
+                $('#Workshops option').remove();
+                $.getJSON('../Common/GetCOW_FilterWorkshopsInquiry', { p_PlantId: $('#Plants').val(), p_FactoryId: $('#Factories').val(), p_WorkshopTypeId: $('#WorkshopTypes').val() }, function (data) {
+                    $.each(data, function () {
+                        $('#Workshops').append('<option value=' +
+                          this.WorkshopId + '>' + this.WorkshopName + '</option>');
+                    });
+
+                }).fail(function (jqXHR, textStatus, errorThrown) {
+                    alert('Error getting products!');
+                });
+            });
+
+            $('#WorkshopTypes').change(function () {
+                $('#Workshops option').remove();
+                $.getJSON('../Common/GetCOW_FilterWorkshopsInquiry', { p_PlantId: $('#Plants').val(), p_FactoryId: $('#Factories').val(), p_WorkshopTypeId: $('#WorkshopTypes').val() }, function (data) {
+                    $.each(data, function () {
+                        $('#Workshops').append('<option value=' +
+                          this.WorkshopId + '>' + this.WorkshopName + '</option>');
+                    });
+
+                }).fail(function (jqXHR, textStatus, errorThrown) {
+                    alert('Error getting products!');
+                });
+            });
+            $(':input:checked').parent('.btn').addClass('active');
+        });
+
+        var isClick = true;
+        function isZoom() {
+            if (isClick) {
+                $(".img-upload-thumb-wrap").css("width", "100%");
+                isClick = false;
+            } else {
+                $(".img-upload-thumb-wrap").css("width", "100px");
+                isClick = true;
+            }
+        };
+
+        $('.upload-close').on("click",function () {
+            $('.upload-display').remove();
+            $('.upload-filename').val(null);
+
+            $('#files').val('');
+            $('#excelFilename').val('');
+            $('#Excel').empty();
+        });
+
+        function itemClear() {
+            $('.upload-display').remove();
+            $('.upload-filename').val(null);
+        };
+        function dataSave(plantid,workshopid,partid,imageName) {
+            $.post('../Master/ImageSave', { plant: plantid, workshop: workshopid, part: partid, imgName: imageName }, function (data) {
+                console.log(data);
+            });
+        };
+    </script>
+}

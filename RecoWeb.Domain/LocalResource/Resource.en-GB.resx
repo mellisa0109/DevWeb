@@ -1,0 +1,1017 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="DepName" xml:space="preserve">
+    <value>Department</value>
+  </data>
+  <data name="Employee" xml:space="preserve">
+    <value>EMPLOYEE</value>
+  </data>
+  <data name="Delivery" xml:space="preserve">
+    <value>Delivery Management</value>
+  </data>
+  <data name="EmployeeId" xml:space="preserve">
+    <value>Employee Id</value>
+  </data>
+  <data name="EmployeeName" xml:space="preserve">
+    <value>Employee Name</value>
+  </data>
+  <data name="Example" xml:space="preserve">
+    <value>Example</value>
+  </data>
+  <data name="ExamplePage" xml:space="preserve">
+    <value>Example Page</value>
+  </data>
+  <data name="E_Mail" xml:space="preserve">
+    <value>E-Mail</value>
+  </data>
+  <data name="Gubun" xml:space="preserve">
+    <value>Type</value>
+  </data>
+  <data name="InitialPassword" xml:space="preserve">
+    <value>Initial Password</value>
+  </data>
+  <data name="In_Out" xml:space="preserve">
+    <value>IN/OUT</value>
+  </data>
+  <data name="IsUse" xml:space="preserve">
+    <value>Is Use</value>
+  </data>
+  <data name="LogIn" xml:space="preserve">
+    <value>Log In</value>
+  </data>
+  <data name="Menu_Delivery" xml:space="preserve">
+    <value>DELIVERY</value>
+  </data>
+  <data name="Menu_DowntimeTop10" xml:space="preserve">
+    <value>DOWNTIME TOP10</value>
+  </data>
+  <data name="Menu_Lot" xml:space="preserve">
+    <value>LOT</value>
+  </data>
+  <data name="Menu_LotTraceTreeView" xml:space="preserve">
+    <value>LOT TREEVIEW</value>
+  </data>
+  <data name="Lot" xml:space="preserve">
+    <value>LOT</value>
+  </data>
+  <data name="Master" xml:space="preserve">
+    <value>Master Code</value>
+  </data>
+  <data name="Material" xml:space="preserve">
+    <value>Material Management</value>
+  </data>
+  <data name="MenuEdit" xml:space="preserve">
+    <value>Menu Edit</value>
+  </data>
+  <data name="Menu_Master" xml:space="preserve">
+    <value>Master Code</value>
+  </data>
+  <data name="Menu_Material" xml:space="preserve">
+    <value>MATERIAL</value>
+  </data>
+  <data name="Menu_MenuEdit" xml:space="preserve">
+    <value>MENU MANAGEMENT</value>
+  </data>
+  <data name="Menu_Notice" xml:space="preserve">
+    <value>NOTICE</value>
+  </data>
+  <data name="Menu_Permissions" xml:space="preserve">
+    <value>MENU PERMISSION</value>
+  </data>
+  <data name="Menu_Preferences" xml:space="preserve">
+    <value>SYSTEM PREFERENCES</value>
+  </data>
+  <data name="Menu_Production" xml:space="preserve">
+    <value>PRODUCTION</value>
+  </data>
+  <data name="Menu_Quality" xml:space="preserve">
+    <value>QUIALITY</value>
+  </data>
+  <data name="Menu_SequenceInformationStatistics" xml:space="preserve">
+    <value>SEQUENCE INFO STATISTICS</value>
+  </data>
+  <data name="Menu_TpmCheckSheetItem" xml:space="preserve">
+    <value>TPM CHECKSHEET ITEM</value>
+  </data>
+  <data name="MmSection" xml:space="preserve">
+    <value>MM Section</value>
+  </data>
+  <data name="Msg_Login_ForgetPw" xml:space="preserve">
+    <value>if you forget password</value>
+  </data>
+  <data name="Msg_Login_WelcomeSub" xml:space="preserve">
+    <value>Use a local account to log in</value>
+  </data>
+  <data name="Msg_Login_WelcomeTitle" xml:space="preserve">
+    <value>Welcom in Mes System</value>
+  </data>
+  <data name="Password" xml:space="preserve">
+    <value>Password</value>
+  </data>
+  <data name="PhoneNo" xml:space="preserve">
+    <value>Phone No</value>
+  </data>
+  <data name="PositionName" xml:space="preserve">
+    <value>Position</value>
+  </data>
+  <data name="ProductionSection" xml:space="preserve">
+    <value>Production Section</value>
+  </data>
+  <data name="PtSection" xml:space="preserve">
+    <value>PT Section</value>
+  </data>
+  <data name="QcSection" xml:space="preserve">
+    <value>QC Section</value>
+  </data>
+  <data name="RdSection" xml:space="preserve">
+    <value>RD Section</value>
+  </data>
+  <data name="Permissions" xml:space="preserve">
+    <value>Menu Permissions</value>
+  </data>
+  <data name="Preferences" xml:space="preserve">
+    <value>Preferences</value>
+  </data>
+  <data name="Production" xml:space="preserve">
+    <value>Production Management</value>
+  </data>
+  <data name="Quality" xml:space="preserve">
+    <value>Quality Management</value>
+  </data>
+  <data name="RememberMe" xml:space="preserve">
+    <value>Remember me</value>
+  </data>
+  <data name="System" xml:space="preserve">
+    <value>System</value>
+  </data>
+  <data name="User" xml:space="preserve">
+    <value>USER CODE</value>
+  </data>
+  <data name="User01" xml:space="preserve">
+    <value>USER CODE 01</value>
+  </data>
+  <data name="UserName" xml:space="preserve">
+    <value>User Name</value>
+  </data>
+  <data name="WrokshopId" xml:space="preserve">
+    <value>Workshop Id</value>
+  </data>
+  <data name="Menu_Example" xml:space="preserve">
+    <value>EXAMPLE 1</value>
+  </data>
+  <data name="Menu_Example2" xml:space="preserve">
+    <value>EXAMPLE 2</value>
+  </data>
+  <data name="Menu_GridTest" xml:space="preserve">
+    <value>GRID TEST</value>
+  </data>
+  <data name="Menu_Home" xml:space="preserve">
+    <value>HOME</value>
+  </data>
+  <data name="Menu_System" xml:space="preserve">
+    <value>SYSTEM</value>
+  </data>
+  <data name="Menu_TransLangSample" xml:space="preserve">
+    <value>TRANS LANG TEST</value>
+  </data>
+  <data name="Menu_JWP" xml:space="preserve">
+    <value>JinWon</value>
+  </data>
+  <data name="Menu_JWP_Test01" xml:space="preserve">
+    <value>JinWon Test page01</value>
+  </data>
+  <data name="Inquiry" xml:space="preserve">
+    <value>Inquiry</value>
+  </data>
+  <data name="Menu_JWP_TestLayout" xml:space="preserve">
+    <value>jw test layout</value>
+  </data>
+  <data name="Menu_AuthorizeExample" xml:space="preserve">
+    <value>Authorize Example</value>
+  </data>
+  <data name="New" xml:space="preserve">
+    <value>New</value>
+  </data>
+  <data name="Delete" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="Update" xml:space="preserve">
+    <value>Update</value>
+  </data>
+  <data name="NonUse" xml:space="preserve">
+    <value>Non-Use</value>
+  </data>
+  <data name="Use" xml:space="preserve">
+    <value>Use</value>
+  </data>
+  <data name="Icon" xml:space="preserve">
+    <value>Icon</value>
+  </data>
+  <data name="MenuCode" xml:space="preserve">
+    <value>Menu Code</value>
+  </data>
+  <data name="MenuName" xml:space="preserve">
+    <value>Menu Name</value>
+  </data>
+  <data name="ActionMethod" xml:space="preserve">
+    <value>Acti.</value>
+  </data>
+  <data name="Category" xml:space="preserve">
+    <value>Cate.</value>
+  </data>
+  <data name="Controller" xml:space="preserve">
+    <value>Con.</value>
+  </data>
+  <data name="Description" xml:space="preserve">
+    <value>Des.</value>
+  </data>
+  <data name="IconValue" xml:space="preserve">
+    <value>IconValue</value>
+  </data>
+  <data name="ParentMenuCode" xml:space="preserve">
+    <value>ParentCode</value>
+  </data>
+  <data name="Sequence" xml:space="preserve">
+    <value>Seq.</value>
+  </data>
+  <data name="Menu_DropdownFilterSample" xml:space="preserve">
+    <value>Drowdownlist Filter Sample</value>
+  </data>
+  <data name="Menu_BCI" xml:space="preserve">
+    <value>Check Point Item</value>
+  </data>
+  <data name="Menu_BCI1" xml:space="preserve">
+    <value>Line Check Cycle</value>
+  </data>
+  <data name="Menu_BCI2" xml:space="preserve">
+    <value>Check List</value>
+  </data>
+  <data name="Menu_BCI3" xml:space="preserve">
+    <value>Check Point Item</value>
+  </data>
+  <data name="Menu_BDT" xml:space="preserve">
+    <value>Defect Type</value>
+  </data>
+  <data name="Menu_BDT1" xml:space="preserve">
+    <value>Defect Type</value>
+  </data>
+  <data name="Menu_BMC" xml:space="preserve">
+    <value>Master Code</value>
+  </data>
+  <data name="Menu_BMC1" xml:space="preserve">
+    <value>Common Code</value>
+  </data>
+  <data name="Menu_BMC2" xml:space="preserve">
+    <value>Plant Information</value>
+  </data>
+  <data name="Menu_BMC3" xml:space="preserve">
+    <value>Line Information</value>
+  </data>
+  <data name="Menu_BMC4" xml:space="preserve">
+    <value>Work Type Information</value>
+  </data>
+  <data name="Menu_BMC5" xml:space="preserve">
+    <value>Create Work Calendar</value>
+  </data>
+  <data name="Menu_BMC6" xml:space="preserve">
+    <value>Inquiry Work Calendar</value>
+  </data>
+  <data name="Menu_BMM" xml:space="preserve">
+    <value>Monitoring Master Code</value>
+  </data>
+  <data name="Menu_BMM1" xml:space="preserve">
+    <value>Monitoring Code</value>
+  </data>
+  <data name="Menu_BMM2" xml:space="preserve">
+    <value>Monitoring Page Code</value>
+  </data>
+  <data name="Menu_BMM3" xml:space="preserve">
+    <value>Monitoring Page Setting</value>
+  </data>
+  <data name="Menu_BMM4" xml:space="preserve">
+    <value>Monitoring Image Upload</value>
+  </data>
+  <data name="Menu_BNT" xml:space="preserve">
+    <value>Notwork Type</value>
+  </data>
+  <data name="Menu_BNT1" xml:space="preserve">
+    <value>Common Notwork Type</value>
+  </data>
+  <data name="Menu_BNT2" xml:space="preserve">
+    <value>Line Notwork Type</value>
+  </data>
+  <data name="Menu_BPC" xml:space="preserve">
+    <value>Final Check Item</value>
+  </data>
+  <data name="Menu_BPC1" xml:space="preserve">
+    <value>Line Check Cycle</value>
+  </data>
+  <data name="Menu_BPC2" xml:space="preserve">
+    <value>Check List</value>
+  </data>
+  <data name="Menu_BPC3" xml:space="preserve">
+    <value>Final Check Item</value>
+  </data>
+  <data name="Menu_BPI" xml:space="preserve">
+    <value>Part Information</value>
+  </data>
+  <data name="Menu_BPI1" xml:space="preserve">
+    <value>Car Information</value>
+  </data>
+  <data name="Menu_BPI2" xml:space="preserve">
+    <value>Part List Information</value>
+  </data>
+  <data name="Menu_BPI3" xml:space="preserve">
+    <value>BOM Information</value>
+  </data>
+  <data name="Menu_BPI4" xml:space="preserve">
+    <value>ROUTING Information</value>
+  </data>
+  <data name="Menu_BPI5" xml:space="preserve">
+    <value>Work Standard Image</value>
+  </data>
+  <data name="Menu_BPI6" xml:space="preserve">
+    <value>PLC Spec</value>
+  </data>
+  <data name="Menu_BUI" xml:space="preserve">
+    <value>User Information</value>
+  </data>
+  <data name="Menu_BUI1" xml:space="preserve">
+    <value>User Information</value>
+  </data>
+  <data name="Menu_DCS" xml:space="preserve">
+    <value>Car Status</value>
+  </data>
+  <data name="Menu_DCS1" xml:space="preserve">
+    <value>Delete Car Information</value>
+  </data>
+  <data name="Menu_DDS" xml:space="preserve">
+    <value>Delivery Status</value>
+  </data>
+  <data name="Menu_DDS1" xml:space="preserve">
+    <value>Shipment Order Action Status</value>
+  </data>
+  <data name="Menu_DDS2" xml:space="preserve">
+    <value>Shipment Result Status</value>
+  </data>
+  <data name="Menu_DDS3" xml:space="preserve">
+    <value>Carriage Result By Period</value>
+  </data>
+  <data name="Menu_DDS4" xml:space="preserve">
+    <value>Delivery Order Status</value>
+  </data>
+  <data name="Menu_DDS5" xml:space="preserve">
+    <value>Shipment Order Status</value>
+  </data>
+  <data name="Menu_DDS6" xml:space="preserve">
+    <value>Total Shipment Result</value>
+  </data>
+  <data name="Menu_DDS7" xml:space="preserve">
+    <value>Factory Move By Period</value>
+  </data>
+  <data name="Menu_DDS8" xml:space="preserve">
+    <value>Total Factory Move Result</value>
+  </data>
+  <data name="Menu_DMS" xml:space="preserve">
+    <value>Material Master</value>
+  </data>
+  <data name="Menu_DMS1" xml:space="preserve">
+    <value>Delivery Information</value>
+  </data>
+  <data name="Menu_DMS2" xml:space="preserve">
+    <value>Delivery Part information</value>
+  </data>
+  <data name="Menu_DMS3" xml:space="preserve">
+    <value>Shipment Part Information</value>
+  </data>
+  <data name="Menu_DMS4" xml:space="preserve">
+    <value>Factory Move Part Information</value>
+  </data>
+  <data name="Menu_DMS5" xml:space="preserve">
+    <value>Delivery Car Information</value>
+  </data>
+  <data name="Menu_DPM" xml:space="preserve">
+    <value>Delivery Palette</value>
+  </data>
+  <data name="Menu_DPM1" xml:space="preserve">
+    <value>Palette Master Code</value>
+  </data>
+  <data name="Menu_DPM2" xml:space="preserve">
+    <value>Palette Maintenance Type</value>
+  </data>
+  <data name="Menu_DPM3" xml:space="preserve">
+    <value>Palette Location Status</value>
+  </data>
+  <data name="Menu_DPM4" xml:space="preserve">
+    <value>Palette stagnant Status</value>
+  </data>
+  <data name="Menu_DPM5" xml:space="preserve">
+    <value>Palette I/O History</value>
+  </data>
+  <data name="Menu_DPM6" xml:space="preserve">
+    <value>Palette Maintenance History</value>
+  </data>
+  <data name="Menu_DYP" xml:space="preserve">
+    <value>HN YP Sequence</value>
+  </data>
+  <data name="Menu_DYP1" xml:space="preserve">
+    <value>Master Code-Sequence Car</value>
+  </data>
+  <data name="Menu_DYP2" xml:space="preserve">
+    <value>Master Code-CommomCode</value>
+  </data>
+  <data name="Menu_DYP3" xml:space="preserve">
+    <value>Master Code-Sequence Part</value>
+  </data>
+  <data name="Menu_DYP4" xml:space="preserve">
+    <value>Sequence Upload Status</value>
+  </data>
+  <data name="Menu_DYP5" xml:space="preserve">
+    <value>Total Sequence Information</value>
+  </data>
+  <data name="Menu_EBI" xml:space="preserve">
+    <value>Base Information</value>
+  </data>
+  <data name="Menu_EBI1" xml:space="preserve">
+    <value>Maintenance Line Code</value>
+  </data>
+  <data name="Menu_EBI2" xml:space="preserve">
+    <value>Sparepart Line Code</value>
+  </data>
+  <data name="Menu_EBI3" xml:space="preserve">
+    <value>Equipment Grade Code</value>
+  </data>
+  <data name="Menu_EBI4" xml:space="preserve">
+    <value>Equipment Classification Code</value>
+  </data>
+  <data name="Menu_EBI5" xml:space="preserve">
+    <value>Equipment Code</value>
+  </data>
+  <data name="Menu_EBI6" xml:space="preserve">
+    <value>Breakdown Code</value>
+  </data>
+  <data name="Menu_EBI7" xml:space="preserve">
+    <value>Daily Inspection Item</value>
+  </data>
+  <data name="Menu_EBI8" xml:space="preserve">
+    <value>Regular Inspection Item</value>
+  </data>
+  <data name="Menu_EDI" xml:space="preserve">
+    <value>Daily Inspection Management</value>
+  </data>
+  <data name="Menu_EDI1" xml:space="preserve">
+    <value>Daily Inspection History By Line</value>
+  </data>
+  <data name="Menu_EMH" xml:space="preserve">
+    <value>Equipment Maintenance History</value>
+  </data>
+  <data name="Menu_EMH1" xml:space="preserve">
+    <value>Maintenance Daily Work Log</value>
+  </data>
+  <data name="Menu_EMH2" xml:space="preserve">
+    <value>Equipment Breakdown Handling History</value>
+  </data>
+  <data name="Menu_EMH3" xml:space="preserve">
+    <value>Aggregate Of Equipment Breakdown Detail</value>
+  </data>
+  <data name="Menu_EMH4" xml:space="preserve">
+    <value>Breakdown Rate Trend</value>
+  </data>
+  <data name="Menu_EMH5" xml:space="preserve">
+    <value>Breakdown Status By Period</value>
+  </data>
+  <data name="Menu_EMH6" xml:space="preserve">
+    <value>MTTR/MTBF By Line</value>
+  </data>
+  <data name="Menu_ERI" xml:space="preserve">
+    <value>Regular Inspection Management</value>
+  </data>
+  <data name="Menu_ERI1" xml:space="preserve">
+    <value>Regular Inspection Plan(Years)</value>
+  </data>
+  <data name="Menu_ERI2" xml:space="preserve">
+    <value>Regular Inspection Plan(Month)</value>
+  </data>
+  <data name="Menu_ERI3" xml:space="preserve">
+    <value>Regular Inspection NG History</value>
+  </data>
+  <data name="Menu_ERI4" xml:space="preserve">
+    <value>Equipment Status By Grade</value>
+  </data>
+  <data name="Menu_ESM" xml:space="preserve">
+    <value>Sparepart Management</value>
+  </data>
+  <data name="Menu_ESM1" xml:space="preserve">
+    <value>I/O History</value>
+  </data>
+  <data name="Menu_ESM2" xml:space="preserve">
+    <value>Sparepart Current Inventory</value>
+  </data>
+  <data name="Menu_ESM3" xml:space="preserve">
+    <value>General Part Inventory Adjustment</value>
+  </data>
+  <data name="Menu_ESM4" xml:space="preserve">
+    <value>Purchase Request</value>
+  </data>
+  <data name="Menu_ESM5" xml:space="preserve">
+    <value>Purchase Request History</value>
+  </data>
+  <data name="Menu_ESM6" xml:space="preserve">
+    <value>Order Application History</value>
+  </data>
+  <data name="Menu_LIQ" xml:space="preserve">
+    <value>Integrated Quality History</value>
+  </data>
+  <data name="Menu_LIQ1" xml:space="preserve">
+    <value>Marking History</value>
+  </data>
+  <data name="Menu_LIQ2" xml:space="preserve">
+    <value>SPOT Welding</value>
+  </data>
+  <data name="Menu_LIQ3" xml:space="preserve">
+    <value>CO2 Welding</value>
+  </data>
+  <data name="Menu_LIQ4" xml:space="preserve">
+    <value>CO2 Vision</value>
+  </data>
+  <data name="Menu_LIQ5" xml:space="preserve">
+    <value>Siller</value>
+  </data>
+  <data name="Menu_LIQ6" xml:space="preserve">
+    <value>SPC Vision</value>
+  </data>
+  <data name="Menu_LIQ7" xml:space="preserve">
+    <value>SPC Jig</value>
+  </data>
+  <data name="Menu_LIQ8" xml:space="preserve">
+    <value>HW Missings Check</value>
+  </data>
+  <data name="Menu_LLT" xml:space="preserve">
+    <value>LOT History Management</value>
+  </data>
+  <data name="Menu_LLT1" xml:space="preserve">
+    <value>Production LOT History</value>
+  </data>
+  <data name="Menu_LLT2" xml:space="preserve">
+    <value>Input LOT history</value>
+  </data>
+  <data name="Menu_LLT3" xml:space="preserve">
+    <value>Material Input Status</value>
+  </data>
+  <data name="Menu_LTM" xml:space="preserve">
+    <value>Traceability Manage</value>
+  </data>
+  <data name="Menu_LTM1" xml:space="preserve">
+    <value>LOT Check By Date</value>
+  </data>
+  <data name="Menu_LTM2" xml:space="preserve">
+    <value>Correct Deployment LOT Check</value>
+  </data>
+  <data name="Menu_LTM3" xml:space="preserve">
+    <value>Reverse Deployment LOT Check</value>
+  </data>
+  <data name="Menu_LTM4" xml:space="preserve">
+    <value>Receiving Date (Reverse Deployment) LOT Check</value>
+  </data>
+  <data name="Menu_LTM5" xml:space="preserve">
+    <value>Correct Deployment TreeView</value>
+  </data>
+  <data name="Menu_LTM6" xml:space="preserve">
+    <value>Moving And Stack Palette Matching History</value>
+  </data>
+  <data name="Menu_LTM7" xml:space="preserve">
+    <value>Forwarding Palette Check</value>
+  </data>
+  <data name="Menu_Maintenance" xml:space="preserve">
+    <value>Maintenance</value>
+  </data>
+  <data name="Menu_MMC" xml:space="preserve">
+    <value>Material Master</value>
+  </data>
+  <data name="Menu_MMC1" xml:space="preserve">
+    <value>SCM Interface Data</value>
+  </data>
+  <data name="Menu_MMC2" xml:space="preserve">
+    <value>Outsourcing Blanking Part</value>
+  </data>
+  <data name="Menu_MMD" xml:space="preserve">
+    <value>DH Result</value>
+  </data>
+  <data name="Menu_MMD1" xml:space="preserve">
+    <value>Production Result</value>
+  </data>
+  <data name="Menu_MMD2" xml:space="preserve">
+    <value>Delivery Result</value>
+  </data>
+  <data name="Menu_MMD3" xml:space="preserve">
+    <value>Material Information</value>
+  </data>
+  <data name="Menu_PCM" xml:space="preserve">
+    <value>Check Point Management</value>
+  </data>
+  <data name="Menu_PCM1" xml:space="preserve">
+    <value>Check Point History</value>
+  </data>
+  <data name="Menu_PCM2" xml:space="preserve">
+    <value>XBAR-R Chart</value>
+  </data>
+  <data name="Menu_PCM3" xml:space="preserve">
+    <value>Defact Control Chart</value>
+  </data>
+  <data name="Menu_PCM4" xml:space="preserve">
+    <value>Check Point Status</value>
+  </data>
+  <data name="Menu_PNS" xml:space="preserve">
+    <value>Notwork Status</value>
+  </data>
+  <data name="Menu_PNS1" xml:space="preserve">
+    <value>Detail Notwork Status By Line</value>
+  </data>
+  <data name="Menu_PNS2" xml:space="preserve">
+    <value>Notwork Status By Problem</value>
+  </data>
+  <data name="Menu_PNS3" xml:space="preserve">
+    <value>Notwork Top10</value>
+  </data>
+  <data name="Menu_PNS4" xml:space="preserve">
+    <value>Notwork Trends</value>
+  </data>
+  <data name="Menu_PNS5" xml:space="preserve">
+    <value>Notwork History Modified</value>
+  </data>
+  <data name="Menu_PPP" xml:space="preserve">
+    <value>Production Plan</value>
+  </data>
+  <data name="Menu_PPP1" xml:space="preserve">
+    <value>Production Plan (Time)</value>
+  </data>
+  <data name="Menu_PPP2" xml:space="preserve">
+    <value>Production Plan (Seq)</value>
+  </data>
+  <data name="Menu_PPS" xml:space="preserve">
+    <value>Production Status</value>
+  </data>
+  <data name="Menu_PPS1" xml:space="preserve">
+    <value>Line State Monitoring</value>
+  </data>
+  <data name="Menu_PPS2" xml:space="preserve">
+    <value>Production Status By Period</value>
+  </data>
+  <data name="Menu_PPS3" xml:space="preserve">
+    <value>Production Status By Line</value>
+  </data>
+  <data name="Menu_PPS4" xml:space="preserve">
+    <value>Plan Contrast Production Status</value>
+  </data>
+  <data name="Menu_PPS5" xml:space="preserve">
+    <value>Production Status By WorkGroup</value>
+  </data>
+  <data name="Menu_PPS6" xml:space="preserve">
+    <value>Production Status By Operating</value>
+  </data>
+  <data name="Menu_PPS7" xml:space="preserve">
+    <value>Analysis Production</value>
+  </data>
+  <data name="Menu_PPS8" xml:space="preserve">
+    <value>Production Status Modified</value>
+  </data>
+  <data name="Menu_PPS9" xml:space="preserve">
+    <value>Detail Production Status By Part</value>
+  </data>
+  <data name="Menu_QDS" xml:space="preserve">
+    <value>Defect Status</value>
+  </data>
+  <data name="Menu_QDS1" xml:space="preserve">
+    <value>Non-compliance Suspicion Not Processing Status</value>
+  </data>
+  <data name="Menu_QDS2" xml:space="preserve">
+    <value>Non-compliance Processing Detail</value>
+  </data>
+  <data name="Menu_QDS3" xml:space="preserve">
+    <value>Defect Status</value>
+  </data>
+  <data name="Menu_QDS4" xml:space="preserve">
+    <value>Defect Occur Trend</value>
+  </data>
+  <data name="Menu_QDS5" xml:space="preserve">
+    <value>Defect TOP 10</value>
+  </data>
+  <data name="Menu_QFI" xml:space="preserve">
+    <value>Final Inspection Management</value>
+  </data>
+  <data name="Menu_QFI1" xml:space="preserve">
+    <value>Final Inspection History</value>
+  </data>
+  <data name="Menu_QFI2" xml:space="preserve">
+    <value>XBAR-R Chart</value>
+  </data>
+  <data name="Menu_QFI3" xml:space="preserve">
+    <value>Defect Rate Management Chart</value>
+  </data>
+  <data name="Menu_QFI4" xml:space="preserve">
+    <value>Final Inspection Status</value>
+  </data>
+  <data name="BoxQty" xml:space="preserve">
+    <value>Qty</value>
+  </data>
+  <data name="CarSequence" xml:space="preserve">
+    <value>Car Seq.</value>
+  </data>
+  <data name="CarType" xml:space="preserve">
+    <value>Car Type</value>
+  </data>
+  <data name="DPDate" xml:space="preserve">
+    <value>DP Date</value>
+  </data>
+  <data name="FirstCN" xml:space="preserve">
+    <value>First C.N</value>
+  </data>
+  <data name="LastCN" xml:space="preserve">
+    <value>Last C.N</value>
+  </data>
+  <data name="LOTSequence" xml:space="preserve">
+    <value>LOT Seq.</value>
+  </data>
+  <data name="PrintPallet" xml:space="preserve">
+    <value>Print Pallet</value>
+  </data>
+  <data name="TotalPallet" xml:space="preserve">
+    <value>Total Pallet</value>
+  </data>
+  <data name="Menu_SIS" xml:space="preserve">
+    <value>Sequence Information Statistics</value>
+  </data>
+  <data name="AreaCode" xml:space="preserve">
+    <value>Location</value>
+  </data>
+  <data name="BodyNo" xml:space="preserve">
+    <value>BODY NO</value>
+  </data>
+  <data name="CarName" xml:space="preserve">
+    <value>Car Name</value>
+  </data>
+  <data name="CommitNo" xml:space="preserve">
+    <value>COMMIT</value>
+  </data>
+  <data name="DisplayCode" xml:space="preserve">
+    <value>Display Code</value>
+  </data>
+  <data name="isPrint" xml:space="preserve">
+    <value>isPrint</value>
+  </data>
+  <data name="OrderNo" xml:space="preserve">
+    <value>W/ORDER</value>
+  </data>
+  <data name="PartCode" xml:space="preserve">
+    <value>Part Code</value>
+  </data>
+  <data name="Qty" xml:space="preserve">
+    <value>Qty</value>
+  </data>
+  <data name="RankAHS" xml:space="preserve">
+    <value>AHS</value>
+  </data>
+  <data name="RankBT" xml:space="preserve">
+    <value>B/T</value>
+  </data>
+  <data name="RankCar" xml:space="preserve">
+    <value>Car Type</value>
+  </data>
+  <data name="RankDT" xml:space="preserve">
+    <value>D/T</value>
+  </data>
+  <data name="RankEC" xml:space="preserve">
+    <value>E/C</value>
+  </data>
+  <data name="RankET" xml:space="preserve">
+    <value>E/T</value>
+  </data>
+  <data name="RankLEG" xml:space="preserve">
+    <value>LEG</value>
+  </data>
+  <data name="RankMT" xml:space="preserve">
+    <value>M/T</value>
+  </data>
+  <data name="RankPE" xml:space="preserve">
+    <value>YP PE</value>
+  </data>
+  <data name="RankPSD" xml:space="preserve">
+    <value>PSD</value>
+  </data>
+  <data name="RankPTG" xml:space="preserve">
+    <value>RTG</value>
+  </data>
+  <data name="RankRoof" xml:space="preserve">
+    <value>Sun Roof</value>
+  </data>
+  <data name="RankRrack" xml:space="preserve">
+    <value>Roof Rack</value>
+  </data>
+  <data name="RankPaletteNo" xml:space="preserve">
+    <value>Pallet No.</value>
+  </data>
+  <data name="Menu_LotTraceTreeView2" xml:space="preserve">
+    <value>LOT TREEVIEW TEST</value>
+  </data>
+  <data name="RecentVisit" xml:space="preserve">
+    <value>Recent Visit</value>
+  </data>
+  <data name="SiteTitle" xml:space="preserve">
+    <value>Reco+</value>
+  </data>
+  <data name="Menu_TCI" xml:space="preserve">
+    <value>Tpm CheckSheet Item</value>
+  </data>
+  <data name="Image" xml:space="preserve">
+    <value>Image</value>
+  </data>
+  <data name="PartName" xml:space="preserve">
+    <value>Part Name</value>
+  </data>
+  <data name="WorkshopName" xml:space="preserve">
+    <value>Workshop Name</value>
+  </data>
+  <data name="ApplyEndDate" xml:space="preserve">
+    <value>Apply End Date</value>
+  </data>
+  <data name="ApplyStartDate" xml:space="preserve">
+    <value>Apply Start Date</value>
+  </data>
+  <data name="CheckItem" xml:space="preserve">
+    <value>Check Item</value>
+  </data>
+  <data name="CheckMethod" xml:space="preserve">
+    <value>Check Method</value>
+  </data>
+  <data name="CheckType" xml:space="preserve">
+    <value>Check Type</value>
+  </data>
+  <data name="InputType" xml:space="preserve">
+    <value>Input Type</value>
+  </data>
+  <data name="InspectionItemDetail" xml:space="preserve">
+    <value>Inspection</value>
+  </data>
+  <data name="StandardLower" xml:space="preserve">
+    <value>LowerLimit</value>
+  </data>
+  <data name="StandardUpper" xml:space="preserve">
+    <value>UpperLimit</value>
+  </data>
+  <data name="LogOut" xml:space="preserve">
+    <value>Log Out</value>
+  </data>
+  <data name="PasswordChange" xml:space="preserve">
+    <value>Password Change</value>
+  </data>
+  <data name="CheckItemUpload" xml:space="preserve">
+    <value>Upload Check Item</value>
+  </data>
+  <data name="UploadDocument" xml:space="preserve">
+    <value>Upload Document</value>
+  </data>
+  <data name="LargeMenu" xml:space="preserve">
+    <value>Large Menu</value>
+  </data>
+  <data name="MiddleMenu" xml:space="preserve">
+    <value>Middle Menu</value>
+  </data>
+  <data name="SmallMenu" xml:space="preserve">
+    <value>Small Menu</value>
+  </data>
+  <data name="PlantName" xml:space="preserve">
+    <value>Plant Name</value>
+  </data>
+  <data name="DepartmentName1" xml:space="preserve">
+    <value>Section</value>
+  </data>
+  <data name="DepartmentName2" xml:space="preserve">
+    <value>Team</value>
+  </data>
+  <data name="MobilePhoneNo" xml:space="preserve">
+    <value>PhoneNo.</value>
+  </data>
+  <data name="Menu_Menu_JWP_Extreme" xml:space="preserve">
+    <value>Extreme Test</value>
+  </data>
+  <data name="J_Test01" xml:space="preserve">
+    <value>JinWon_Test01</value>
+  </data>
+</root>

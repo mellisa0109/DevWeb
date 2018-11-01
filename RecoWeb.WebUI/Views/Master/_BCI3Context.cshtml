@@ -1,0 +1,272 @@
+﻿
+
+@using RecoWeb.Domain.LocalResource
+@{
+    var radioItems = new[] { "사용", "정지" };
+}
+<div class="col-lg-4 col-md-4 h-100">
+    <div class="ibox">
+        <div class="ibox-title">
+            <span style="font-size:1.4rem;"><i class="fa fa-list-alt" aria-hidden="true"></i>&nbsp;라인별 품목</span>
+        </div>
+        <div class="ibox-content">
+            @*<table id="BCI3-Grid1" cellpadding="0" cellspacing="0"></table>
+            <div id="BCI3-Pager1" style="text-align: center;">
+            </div>*@
+            <div id="data-grid-demo">
+                @(Html.DevExtreme().DataGrid()
+                    .ID("gridContainer01")
+                    .Paging(paging => paging.PageSize(20))
+                    .Pager(pager =>
+                    {
+                        pager.ShowPageSizeSelector(true);
+                        pager.AllowedPageSizes(new List<int> { 20, 50, 100, 200, 300, 500 });
+                        pager.ShowInfo(true);
+                    })
+                    .Export(e => e.Enabled(true).FileName("ExportTest").AllowExportSelectedData(true))
+                    .ColumnAutoWidth(true)
+                    .ShowColumnLines(true)
+                    .ShowRowLines(true)
+                    .ShowBorders(true)
+                    .OnContentReady("onReady") // 레디 이벤트
+                    .HoverStateEnabled(true)
+                    .Sorting(e => e.Mode(GridSortingMode.Multiple))
+                    .ColumnMinWidth(50)
+                    .AllowColumnResizing(true)
+                    .Option("columnResizingMode", ColumnResizingMode.Widget)
+                    .OnCellPrepared("cellPrepared") //색칠하는 이벤트
+                                                    //칼럼이름의 시작에 !, @, -, _를 붙이면 _로 바뀜
+                    .DataSource(ds => ds.Mvc().Controller("Master").Key("_KeyColumn")
+                        .LoadAction("GetBCI3PartByLine")
+                        .LoadParams(new
+                        {
+                            plantId = new JS("getIdValue('Plants')")
+                            ,
+                            factoryId = new JS("getIdValue('Factories')")
+                            ,
+                            workshopTypeId = new JS("getIdValue('WorkshopTypes')")
+                            ,
+                            workshopId = new JS("getIdValue('Workshops')")
+                            ,
+                            partCode = new JS("getCheckedRadio('Part')")
+                            ,
+                            isUse = new JS("getCheckedRadio('isUse')")
+                            ,
+                            user = ""
+                        })
+                        .InsertAction("AAA")
+                        .UpdateAction("BBB")
+                        .DeleteAction("CCC")
+                        
+                    )
+                    .Columns(columns =>
+                    {
+                        columns.Add().DataField("WorkshopName").Caption("라인").Alignment(HorizontalAlignment.Center);
+                        columns.Add().DataField("PartCode").Caption("품번").Alignment(HorizontalAlignment.Left);
+                        columns.Add().DataField("PartName").Caption("품명").Alignment(HorizontalAlignment.Left);
+                        columns.Add().DataField("Image").Caption("이미지").Alignment(HorizontalAlignment.Center);
+                        columns.Add().DataField("TYPE1").Caption("타입1").Alignment(HorizontalAlignment.Left).Visible(false).AllowEditing(true).EditCellTemplate(@<text>@(Html.DevExtreme().RadioGroup().Items(radioItems).Layout(Orientation.Horizontal).OnValueChanged("ff") )</text>);
+                        columns.Add().DataField("TYPE2").Caption("타입2").Alignment(HorizontalAlignment.Left).Visible(false);
+                        columns.Add().DataField("_KeyColumn").Caption("키").Alignment(HorizontalAlignment.Left).Visible(false);
+                        columns.Add().DataField("PARAM").Caption("파라미터").Alignment(HorizontalAlignment.Left).Visible(false);
+                    })
+                    .Editing(e => e.Mode(GridEditMode.Popup)
+                        .AllowAdding(true)
+                        .AllowUpdating(true)
+                        .AllowDeleting(true)
+                        .UseIcons(true)
+                        .Popup(p => p
+                            .ShowTitle(true)
+                            .Width(800)
+                            .Height(550)
+                            .Position(pos => pos
+                                .My(HorizontalAlignment.Center, VerticalAlignment.Center)
+                                .At(HorizontalAlignment.Center, VerticalAlignment.Center)
+                                .Of(new JS("window"))
+                            )
+                        )
+                    )
+                    .OnSelectionChanged("grid1Change") //체인지 이벤트를 선언함
+                    .Height(new JS("heightCalc(' 100')"))
+                    .Selection(e =>e.Mode(SelectionMode.Single))
+                )
+</div>
+        </div>
+    </div>
+</div>
+
+<div class="col-lg-8 col-md-8 h-100">
+    <div>
+        <div class="ibox">
+            <div class="ibox-title">
+                <span style="font-size:1.4rem;"><i class="fa fa-list-ul" aria-hidden="true"></i>&nbsp;검사항목</span>
+            </div>
+            <div class="ibox-content">
+                <div id="data-grid-demo">
+                    @(Html.DevExtreme().DataGrid()
+                    .ID("gridContainer02")
+                    .Paging(paging => paging.PageSize(20))
+                    .Pager(pager =>
+                    {
+                        pager.ShowPageSizeSelector(true);
+                        pager.AllowedPageSizes(new List<int> { 20, 50, 100, 200, 300, 500 });
+                        pager.ShowInfo(true);
+                    })
+                    .Export(e => e.Enabled(true).FileName("ExportTest").AllowExportSelectedData(true))  //Export
+                    .ColumnAutoWidth(true)
+                    .ShowColumnLines(true)
+                    .ShowRowLines(true)
+                    .ShowBorders(true)
+                    .HoverStateEnabled(true)
+                    .Sorting(e => e.Mode(GridSortingMode.Multiple))
+                    .ColumnMinWidth(50)
+                    .AllowColumnResizing(true)
+                    .Option("columnResizingMode", ColumnResizingMode.Widget)
+                    .OnCellPrepared("cellPrepared2")
+                    .DataSource(ds => ds.Mvc().Controller("Master").Key("_KeyColumn")
+                        .LoadAction("GetBCI3CheckList")
+                        .LoadParams(new
+                        {
+                            plantId = new JS("getIdValue('Plants')")
+                            ,
+                            factoryId = new JS("getIdValue('Factories')")
+                            ,
+                            workshopTypeId = new JS("getIdValue('WorkshopTypes')")
+                            ,
+                            workshopId = new JS("getIdValue('Workshops')")
+                            ,
+                            partCode = new JS("getCheckedRadio('Part')")
+                            ,
+                            isUse = new JS("getCheckedRadio('isUse')")
+                            ,
+                            user = ""
+                            ,
+                            workshopParam = ""
+                            ,
+                            partidParam = ""
+                        }
+                        )
+                    )
+                    .Columns(columns =>
+                    {
+                        columns.Add().DataField("PartCode").Caption("품번").Alignment(HorizontalAlignment.Center);
+                        columns.Add().DataField("Sequence").Caption("순번").Alignment(HorizontalAlignment.Left);
+                        columns.Add().DataField("CheckType").Caption("검사구분").Alignment(HorizontalAlignment.Left);
+                        columns.Add().DataField("CheckItem").Caption("검사항목").Alignment(HorizontalAlignment.Left);
+                        columns.Add().DataField("CheckMethod").Caption("검사방법").Alignment(HorizontalAlignment.Left);
+                        columns.Add().DataField("InspectionItemDetail").Caption("검사").Alignment(HorizontalAlignment.Left);
+                        columns.Add().DataField("InputType").Caption("입력방법").Alignment(HorizontalAlignment.Center);
+                        columns.Add().DataField("StandardLower").Caption("하한").Alignment(HorizontalAlignment.Right);
+                        columns.Add().DataField("StandardUpper").Caption("상한").Alignment(HorizontalAlignment.Right);
+                        columns.Add().DataField("ApplyStartDate").Caption("효력시작일").Alignment(HorizontalAlignment.Center);
+                        columns.Add().DataField("ApplyEndDate").Caption("효력종료일").Alignment(HorizontalAlignment.Center);
+                        columns.Add().DataField("_KeyColumn").Caption("키").Alignment(HorizontalAlignment.Left).Visible(false);
+                    })
+                    .Height(new JS("heightCalc('100')"))
+                    .Selection(e => e.Mode(SelectionMode.Single))
+                    )
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script type="text/javascript">
+    
+    function ff(e) {
+        console.log(e);
+    }
+
+    //그리드 Load이후 타는 이벤트
+    function onReady(a) {
+        if ($('#gridContainer01').dxDataGrid("instance").totalCount() > 0) {
+            $('#gridContainer01').dxDataGrid("instance").selectRowsByIndexes(0);
+            //↑ 동일함. (↓더 많은 테스트는 진행못함) 
+            //$('#' + a.element[0].id).dxDataGrid("instance").selectRows(1) 
+        }
+    }
+    var gdndn;
+    function cellPrepared(e) {
+        var fieldData = e.value,
+            fieldHtml = e;
+        if (fieldHtml.rowType == 'data') {
+            if (fieldData) {
+                //값 받아오기 $('#gridContainer01').dxDataGrid("instance").cellValue(키(_KeyColumn)-1,DataField) 
+                var no1 = $('#gridContainer01').dxDataGrid("instance").cellValue(fieldHtml.row.key - 1, 'TYPE1'); //Point 있으면 1
+                var no2 = $('#gridContainer01').dxDataGrid("instance").cellValue(fieldHtml.row.key - 1, 'TYPE2'); //Image 있으면 1
+                if (fieldHtml.column.dataField == 'WorkshopName' || fieldHtml.column.dataField == 'PartCode' || fieldHtml.column.dataField == 'PartName') {
+                    if (no1 == '1') {
+                        //fieldHtml.cellElement[0].style. 여기서 스타일 찾아서 넣기.
+                        fieldHtml.cellElement[0].style.backgroundColor = "#96BEDC";
+                    }
+                }
+                if (fieldHtml.column.dataField == 'Image') {
+                    gdndn = fieldHtml;
+                    //이미지 버튼(링크) 만들기 중..
+                    var params;
+                    params = fieldHtml.cellElement[0].innerHTML.split('&');
+                    paramsArray.push(params);
+                    params[3] = fieldHtml.row.key - 1;
+                    //gdndn.cellElement[0].innerHTML = "<a class='view-modal' data-toggle='modal' data-target='#Modals' href='#'>View</a>";
+                    fieldHtml.cellElement[0].innerHTML = "<a class='view-modal' data-toggle='modal' data-target='#Modals' href='#' onclick='goPartial(" + params[0].split('=')[1] + "," + params[1].split('=')[1] + "," + params[2].split('=')[1] + "," + params[3] + ")'>View</a>";
+
+                    if (no2 == '1') {
+                        fieldHtml.cellElement[0].style.backgroundColor = "#96BEDC";
+                    } else {
+                        fieldHtml.cellElement[0].style.backgroundColor = "#FFFFFF";
+                    }
+                }
+            }
+        }
+    }
+
+    function cellPrepared2(e) {
+        var fieldData = e.value,
+            fieldHtml = e;
+        if (fieldHtml.rowType == 'data') {
+            if (fieldData) {
+                if (fieldHtml.column.dataField == 'PartCode' || fieldHtml.column.dataField == 'Sequence' || fieldHtml.column.dataField == 'CheckType') {
+                    fieldHtml.cellElement[0].style.backgroundColor = "#DCE6F1";
+                    fieldHtml.cellElement[0].style.fontWeight = "600";
+                }
+            }
+        }
+    }
+
+    function grid1Change(selectedRow) {
+        var orders = new DevExpress.data.CustomStore({
+            load: function (loadOptions) {
+                var deferred = $.Deferred(),
+                    args = {};
+
+                if (loadOptions.sort) {
+                    args.orderby = loadOptions.sort[0].selector;
+                    if (loadOptions.sort[0].desc)
+                        args.orderby += " desc";
+                }
+
+                $.ajax({
+                    url: "../Master/GetBCI3CheckList?plantId=" + $("#Plants").val() + "&factoryId=" + $("#Factories").val() + "&workshopTypeId=" + $("#WorkshopTypes").val() + "&workshopId=" + $('#Workshops').val() + "&partCode=" + $('#Part').val() + "&isUse=" + $("input[name='isUse']:checked").val() + "&user=" + "" + "&workshopParam=" + selectedRow.selectedRowsData[0].PARAM.split('&')[0] + "&partidParam=" + selectedRow.selectedRowsData[0].PARAM.split('&')[1],
+                    dataType: "json",
+                    data: args,
+                    success: function (result) {
+                        deferred.resolve(result.data);
+                    },
+                    error: function (e) {
+                        console.log("오류발생");
+                        console.log(e);
+                        deferred.reject("Data Loading Error");
+                    },
+                    timeout: 10000
+                });
+                return deferred.promise();
+            }
+        });
+        $("#gridContainer02").dxDataGrid({
+            dataSource: {
+                store: orders
+            }
+        }).dxDataGrid("instance").refresh();
+    };
+</script>

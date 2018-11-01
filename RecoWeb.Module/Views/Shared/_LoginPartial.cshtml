@@ -1,0 +1,199 @@
+﻿@using System.Globalization
+@using System.Threading;
+@using Microsoft.AspNet.Identity
+@{ 
+
+    var south_korea = Url.Content("~/Content/Images/south-korea_clicked_32.png");
+    var usa = Url.Content("~/Content/Images/usa_clicked_32.png");
+    if (Session["CurrentCulture"] != null)
+    {
+        if (Session["CurrentCulture"].ToString() == "0")
+        {
+            south_korea = Url.Content("~/Content/Images/south-korea_32.png");
+        }
+        else if (Session["CurrentCulture"].ToString() == "1")
+        {
+            usa = Url.Content("~/Content/Images/usa_32.png");
+        }
+    }
+}
+
+@if (Request.IsAuthenticated)
+{
+    using (Html.BeginForm("LogOff", "Account", FormMethod.Post, new { id = "logoutForm", @class = "navbar-right" }))
+    {
+        @Html.AntiForgeryToken()
+        <div class="nav navbar-top-links navbar-right nav-only-PC" style="margin-right:20px;">
+            <li class="dropdown">
+                <a class="dropdown-toggle" data-toggle="dropdown" href="#" style="color:#ffffff; background-color:#f39c12;"><i class="fa fa-user" aria-hidden="true"></i><i class="fa fa-caret-down" aria-hidden="true"></i></a>
+                <ul class="dropdown-menu dropdown-alerts animated fadeInRight">
+                    <li>
+                        <a href="#">@User.Identity.Name</a>
+                    </li>
+                    <li class="divider"></li>
+                    <li>
+                        <a href="@Url.Action("ManagePassword","Account")"><i class="fa fa-key" aria-hidden="true"></i> 비밀번호 변경</a>
+                    </li>
+                    <li class="divider"></li>
+                    <li>
+                        <a href="@Url.Action("LogOff", "Account")"><i class="fa fa-sign-out" aria-hidden="true"></i> 로그아웃</a>
+                    </li>
+                </ul>
+            </li>
+            
+            <li class="dropdown">
+                <a class="dropdown-toggle" data-toggle="dropdown" href="#" style="color:#ffffff; background-color:#2980b9;"><i class="fa fa-globe" aria-hidden="true"></i><i class="fa fa-caret-down" aria-hidden="true"></i></a>
+                <ul class="dropdown-menu dropdown-alerts animated fadeInRight">
+                    <li>
+                        <div class="div-language" style="min-height:0;">
+                            @*<button type="button" class="btn-language-transform language-south-korea"><img src="~/Content/Images/south-korea_32.png" /></button>
+                        <button type="button" class="btn-language-transform language-china"><img src="~/Content/Images/china_32.png" /></button>*@
+
+                            @{
+                                // 나라 이미지를 추가할때 필요한것
+                                // 1. ~/Content/Images/나라이름_32.png
+                                // 2. <a태그 안에 class="btn-language-transform language-나라이름"추가
+                                // * 1번과 2번의 나라이름은 동일하게 사용해야함.
+                                CultureInfo currentCulture = Thread.CurrentThread.CurrentCulture;
+                                <a href="~/Account/ChangeCurrentCulture/0" class="btn-language-transform language-south-korea"><img src="@south_korea" /></a>
+                                <a href="~/Account/ChangeCurrentCulture/1" class="btn-language-transform language-usa"><img src="@usa" /></a>
+                            }
+                        </div>
+                    </li>
+                </ul>
+            </li>
+            
+            <li class="dropdown">
+                <a class="dropdown-toggle" data-toggle="dropdown" href="#" style="color:#ffffff; background-color:#16A085;"><i class="fa fa-paint-brush" aria-hidden="true"></i><i class="fa fa-caret-down" aria-hidden="true"></i></a>
+                <ul class="dropdown-menu dropdown-alerts animated fadeInRight">
+                    <li>
+                        <li>
+                            <div class="setings-item default-skin s-skin-0">
+                                @*<span class="skin-name ">*@
+                                    <a href="#" >
+                                        Default
+                                    </a>
+                                @*</span>*@
+                            </div>
+                        </li>
+                        <li class="divider"></li>
+                        <li>
+                            <div class="setings-item blue-skin s-skin-1">
+                                @*<span class="skin-name ">*@
+                                    <a href="#" >
+                                        Blue light
+                                    </a>
+                                @*</span>*@
+                            </div>
+                        </li>
+                    <li class="divider"></li>
+                    <li>
+                        <div class="setings-item yellow-skin s-skin-3">
+                            @*<span class="skin-name ">*@
+                                <a href="#" >
+                                    Yellow/Purple
+                                </a>
+                            @*</span>*@
+                        </div>
+                    </li>
+                </ul>
+            </li>
+        </div>
+
+        <ul class="nav navbar-top-links navbar-right nav-only-mobile">
+            <li class="dropdown">
+                <a class="dropdown-toggle" data-toggle="dropdown" href="#" style="color:#ffffff;background-color:#f39c12;">
+                    <i class="fa fa-user" aria-hidden="true"></i><i class="fa fa-caret-down" aria-hidden="true"></i>
+                </a>
+                <ul class="dropdown-menu dropdown-alerts animated fadeInRight">
+                    <li>
+                        <a href="#">@User.Identity.Name</a>
+                    </li>
+                    <li class="divider"></li>
+                    <li>
+                        <a href="#">
+                            <div>
+                                <i class="fa fa-key" aria-hidden="true"></i> 비밀번호 변경
+                            </div>
+                        </a>
+                    </li>
+                    <li class="divider"></li>
+                    <li>
+                        <div class="div-language" style="padding:3px 10px; min-height:0; display:inline;">
+                            @*<button type="button" class="btn-language-transform language-south-korea"><img src="~/Content/Images/south-korea_32.png" /></button>
+                            <button type="button" class="btn-language-transform language-china"><img src="~/Content/Images/china_32.png" /></button>*@
+
+                            @{
+                                // 나라 이미지를 추가할때 필요한것
+                                // 1. ~/Content/Images/나라이름_32.png
+                                // 2. <a태그 안에 class="btn-language-transform language-나라이름"추가
+                                // * 1번과 2번의 나라이름은 동일하게 사용해야함.
+                                currentCulture = Thread.CurrentThread.CurrentCulture;
+                                <a href="~/Account/ChangeCurrentCulture/0" class="btn-language-transform language-south-korea"><img src="@south_korea" /></a>
+                                <a href="~/Account/ChangeCurrentCulture/1" class="btn-language-transform language-usa"><img src="@usa" /></a>
+                            }
+                        </div>
+                    </li>
+                    <li class="divider"></li>
+                    <li>
+                        <a href="@Url.Action("LogOff", "Account")">
+                            <i class="fa fa-sign-out" aria-hidden="true"></i> 로그아웃
+                        </a>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+    }
+}
+else
+{
+    <ul class="nav navbar-top-links navbar-right">
+        @*<li>@Html.ActionLink("회원가입", "Register", "Account", routeValues: null, htmlAttributes: new { id = "registerLink" })</li>*@
+        <li>@Html.ActionLink("로그인", "Login", "Account", routeValues: null, htmlAttributes: new { id = "loginLink" })</li>
+    </ul>
+
+
+
+    @*이 소스는 나중에(로그인 테스트할 때) 지우기. 아래에 주석처리된게 위치해야함.*@
+    @*<ul class="nav navbar-top-links navbar-right">
+        <li class="dropdown">
+            <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                <i class="fa fa-user-circle-o" aria-hidden="true"></i>박똘똘
+            </a>
+            <ul class="dropdown-menu dropdown-alerts animated fadeInRight">
+                <li>
+                    <a href="#">
+                        <div>
+                            <i class="fa fa-key" aria-hidden="true"></i> 비밀번호 변경
+                        </div>
+                    </a>
+                </li>
+                <li class="divider"></li>
+                <li>
+                    <div class="div-language" style="padding:3px 10px; min-height:0;">
+
+                        @{
+                            // 나라 이미지를 추가할때 필요한것
+                            // 1. ~/Content/Images/나라이름_32.png
+                            // 2. <a태그 안에 class="btn-language-transform language-나라이름"추가
+                            // * 1번과 2번의 나라이름은 동일하게 사용해야함.
+                            CultureInfo currentCulture = Thread.CurrentThread.CurrentCulture;
+                            <a href="/Account/ChangeCurrentCulture/0" class="btn-language-transform language-south-korea"><img src="~/Content/Images/south-korea_32.png" /></a>
+                                        <a href="/Account/ChangeCurrentCulture/1" class="btn-language-transform language-usa"><img src="~/Content/Images/usa_32.png" /></a>
+                        }
+                    </div>
+                </li>
+                <li class="divider"></li>
+                <li>
+                    <a href="@Url.Action("LogOff", "Account")">
+                        <i class="fa fa-sign-out" aria-hidden="true"></i> 로그아웃
+                    </a>
+                </li>
+            </ul>
+        </li>
+    </ul>*@
+
+
+
+    
+}

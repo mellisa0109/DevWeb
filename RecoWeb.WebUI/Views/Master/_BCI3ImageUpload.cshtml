@@ -1,0 +1,76 @@
+﻿@model RecoWeb.WebUI.Models.TQW_TCIViewModel
+@using RecoWeb.Module
+
+@if (Model != null)
+{
+    if (Model.TQW_CheckSheetImageInquiry != null)
+    {
+        <div class="modal-dialog modal-lg" onload="Loads()">
+
+            <div class="modal-content animated fadeInRight">
+                @*로딩화면*@
+                <div class="sk-spinner sk-spinner-wave">
+                    <div class="sk-rect1"></div>
+                    <div class="sk-rect2"></div>
+                    <div class="sk-rect3"></div>
+                    <div class="sk-rect4"></div>
+                    <div class="sk-rect5"></div>
+                </div>
+                @*팝업 타이틀*@
+                <div class="modal-header">
+                    <button type="button" class="close upload-close" data-dismiss="modal">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                    </button>
+
+                    <h6 class="modal-title">이미지 업로드</h6>
+
+                </div>
+                @*팝업 내용*@
+                <div class="modal-body">
+                    <div>
+                        <label>플랜트 : </label>
+                        @*@Html.LabelFor(x => x.TQW_CheckSheetImageInquiry.FirstOrDefault().PlantName)*@
+                        @Html.SpanFor(x => x.TQW_CheckSheetImageInquiry.FirstOrDefault().PlantName)
+                    </div>
+                    <div>
+                        <label>라인명칭 : </label>
+                        @*@Html.LabelFor(x => x.TQW_CheckSheetImageInquiry.FirstOrDefault().WorkshopName)*@
+                        @Html.SpanFor(x => x.TQW_CheckSheetImageInquiry.FirstOrDefault().WorkshopName)
+                    </div>
+                    <div>
+                        <label>제품코드 : </label>
+                        @*@Html.LabelFor(x => x.TQW_CheckSheetImageInquiry.FirstOrDefault().PartName)*@
+                        @Html.SpanFor(x => x.TQW_CheckSheetImageInquiry.FirstOrDefault().PartName)
+                    </div>
+                    <div>
+                        <div class="filebox preview-image" style="margin-bottom:5px;">
+                            <input class="upload-filename img-filename" disabled="disabled">
+                            <label for="img-files" class="btn-primary">파일선택</label>
+                            <input name="hid" class="upload-hidden img-upload" type="file" id="img-files">
+                            <label class="btn-primary" id="label-img-upload"><i class="fa fa-arrow-circle-o-up" aria-hidden="true"></i>업로드</label>
+                        </div>
+
+                    </div>
+
+                    <div class="lightBoxGallery">
+                        @if (Model.TQW_CheckSheetImageInquiry != null && Model.TQW_CheckSheetImageInquiry.Count() > 0)
+                        {
+                            if (Model.TQW_CheckSheetImageInquiry.FirstOrDefault().FileName != "")
+                            {
+                                foreach (var img in Model.TQW_CheckSheetImageInquiry.ToList())
+                                {
+                                    <a href='@string.Format("http://192.168.1.5/MesWebService.FileUpload/RecoWeb/CheckSheet/Images/{0}/{1}", img.PlantId, img.FileName)' title='@img.FileName' class='modal-img-list' data-gallery=''><img src='@string.Format("http://192.168.1.5/MesWebService.FileUpload/RecoWeb/CheckSheet/Images/{0}/{1}", img.PlantId, img.FileName)' class='modal-img-list'></a>
+                                }
+                            }
+                        }
+                        
+                    </div>
+                </div>
+                @*팝업 버튼들..*@
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default upload-close" data-dismiss="modal">닫기</button>
+                </div>
+            </div>
+        </div>
+    }
+}

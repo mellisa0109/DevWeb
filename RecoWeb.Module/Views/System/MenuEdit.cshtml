@@ -1,0 +1,752 @@
+﻿@model RecoWeb.Module.Models.COW_MenuListInquiryViewModel
+@using RecoWeb.Domain.LocalResource
+
+@{
+
+    AjaxOptions ajaxInquiry = new AjaxOptions
+    {
+        HttpMethod = "GET",
+        InsertionMode = InsertionMode.Replace,
+        OnSuccess = "ContextInquiry",
+        UpdateTargetId = "Context"
+
+    };
+}
+@using (Ajax.BeginForm("AjaxInquiryContextMenu", "System", ajaxInquiry))
+{
+    <div class="row wrapper border-bottom white-bg page-heading">
+        <div class="col-lg-8 col-md-8 col-xs-12" style="display:flex;">
+            <span style="font-size:3rem; float:left; margin-right:0.5rem;">@Model.resourceManager.String(Model.ActivePage)</span>
+            <div style="align-self:flex-end; padding:0.5rem">
+                <ol class="breadcrumb">
+                    <li>
+                        <a href="@Url.Action("Index", "Home")">@Resource.Menu_Home</a>
+                    </li>
+
+                    @foreach (var page in Model.MenuLocation)
+                    {
+                        if (page == Model.ActivePage)
+                        {
+                            <li class="active">
+                                <strong>@Model.resourceManager.String(@page) </strong>
+                            </li>
+                        }
+                        else
+                        {
+                            <li>
+                                <span>@Model.resourceManager.String(@page)</span>
+                            </li>
+                        }
+                    }
+                </ol>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-4" style="margin-top: 0.5rem;">
+            <div class="btn-group pull-right ">
+                <button class="btn btn-default" type="submit" id="btn-find"><i class="fa fa-check"></i>&nbsp;@Resource.Inquiry</button>
+            </div>
+        </div>
+    </div>
+    <div class="row wrapper border-bottom white-bg check-item">
+        <div class="btn-group" data-toggle="buttons">
+            @Html.RadioButtonFor(x => x.isUse, Model.isUse == true ? true : false, new { @class = (Model.isUse == true ? "checked=Checked filter-item" : "") }) @Resource.Use
+            @Html.RadioButtonFor(x => x.isUse, Model.isUse == false ? true : false, new { @class = (Model.isUse == false ? "checked=Checked filter-item" : "") }) @Resource.NonUse
+        </div>
+    </div>
+
+}
+<div id="Context" class="row wrapper wrapper-content animated fadeInRight">
+    @Html.Partial("_MenuEditContext")
+</div>
+
+
+
+@section Styles {
+    <link href="@Url.Action("plugins/jqGrid/ui.jqgrid.css", "Content")" rel="stylesheet" type="text/css" />
+}
+
+@section Scripts {
+
+    <script src="../Scripts/jquery-3.1.1.min.js"></script>
+    <script src= "../Scripts/plugins/jqGrid/i18n/grid.locale-en.js" type="text/javascript"></script>
+    <script src= "../Scripts/plugins/jqGrid/jquery.jqGrid.min.js" type="text/javascript"></script>
+
+
+
+<script type="text/javascript">
+
+        function ContextInquiry() {
+            showGrid1();
+        }
+
+        var selectedIcon;
+        var selectedIsUse;
+        var selectedCategory;
+
+        // 아이콘 판넬
+        var icons = '<div>Icon : <label id="select-icon" class="FormElement"></label></div><div class="btn-group"><button data-toggle="dropdown" class="btn btn-default dropdown-toggle" aria-expanded="false">Action <span class="caret"></span></button>'
+                        + '<ul class="dropdown-menu dropdown-alerts animated fadeInRight dropdown-icon-panel" style="position: fixed;z-index: 999;top: 50%;left: 30%;width: 50%;" ><li><div class="icon-panel" style="font-size:30px;">'
+                        + '<span class="fa fa-thermometer-empty" aria-hidden="true" style="cursor:pointer;"></span>'
+                        + '<span class="fa fa-user-circle-o" aria-hidden="true" style="cursor:pointer;"></span>'
+                        + '<span class="fa fa-linode" aria-hidden="true" style="cursor:pointer;"></span>'
+                        + '<span class="fa fa-ravelry" aria-hidden="true" style="cursor:pointer;"></span>'
+                        + '<span class="fa fa-address-book" style="cursor:pointer;"></span>'
+                        + '<span class="fa fa-github" style="cursor:pointer;"></span>'
+                        + '<span class="fa fa-github-alt" style="cursor:pointer;"></span>'
+                        + '<span class="fa fa-github-square" style="cursor:pointer;"></span>'
+                        + '<span class="fa fa-gitlab" style="cursor:pointer;"></span>'
+                        + '<span class="fa fa-gittip" style="cursor:pointer;"></span>'
+                        + '<span class="fa fa-vk" style="cursor:pointer;"></span>'
+                        + '<span class="fa fa-wechat" style="cursor:pointer;"></span>'
+                        + '<span class="fa fa-weibo" style="cursor:pointer;"></span>'
+                        + '<span class="fa fa-weixin" style="cursor:pointer;"></span>'
+                        + '<span class="fa fa-whatsapp" style="cursor:pointer;"></span>'
+                        + '<span class="fa fa-wikipedia-w" style="cursor:pointer;"></span>'
+                        + '<span class="fa fa-windows" style="cursor:pointer;"></span>'
+                        + '<span class="fa fa-wordpress" style="cursor:pointer;"></span>'
+                        + '<span class="fa fa-wpbeginner" style="cursor:pointer;"></span>'
+                        + '<span class="fa fa-wpexplorer" style="cursor:pointer;"></span>'
+                        + '<span class="fa fa-glide" style="cursor:pointer;"></span>'
+                        + '<span class="fa fa-glide-g" style="cursor:pointer;"></span>'
+                        + '<span class="fa fa-google" style="cursor:pointer;"></span>'
+                        + '<span class="fa fa-google-plus" style="cursor:pointer;"></span>'
+                        + '<span class="fa fa-google-plus-circle" style="cursor:pointer;"></span>'
+                        + '<span class="fa fa-google-plus-official" style="cursor:pointer;"></span>'
+                        + '<span class="fa fa-google-plus-square" style="cursor:pointer;"></span>'
+                        + '<span class="fa fa-google-wallet" style="cursor:pointer;"></span>'
+                        + '<span class="fa fa-gratipay" style="cursor:pointer;"></span>'
+                        + '<span class="fa fa-grav" style="cursor:pointer;"></span>'
+                        + '<span class="fa fa-twitch" style="cursor:pointer;"></span>'
+                        + '<span class="fa fa-twitter" style="cursor:pointer;"></span>'
+                        + '<span class="fa fa-twitter-square" style="cursor:pointer;"></span>'
+                        + '<span class="fa fa-usb" style="cursor:pointer;"></span>'
+                        + '<span class="fa fa-viacoin" style="cursor:pointer;"></span>'
+                        + '<span class="fa fa-viadeo" style="cursor:pointer;"></span>'
+                        + '<span class="fa fa-viadeo-square" style="cursor:pointer;"></span>'
+                        + '<span class="fa fa-vimeo" style="cursor:pointer;"></span>'
+                        + '<span class="fa fa-vimeo-square" style="cursor:pointer;"></span>'
+                        + '<span class="fa fa-vine" style="cursor:pointer;"></span>'
+                        + '<span class="fa fa-hacker-news" style="cursor:pointer;"></span>'
+                        + '<span class="fa fa-houzz" style="cursor:pointer;"></span>'
+                        + '<span class="fa fa-html5" style="cursor:pointer;"></span>'
+                        + '<span class="fa fa-imdb" style="cursor:pointer;"></span>'
+                        + '<span class="fa fa-instagram" style="cursor:pointer;"></span>'
+                        + '<span class="fa fa-internet-explorer" style="cursor:pointer;"></span>'
+                        + '<span class="fa fa-ioxhost" style="cursor:pointer;"></span>'
+                        + '<span class="fa fa-joomla" style="cursor:pointer;"></span>'
+                        + '<span class="fa fa-jsfiddle" style="cursor:pointer;"></span>'
+                        + '<span class="fa fa-lastfm" style="cursor:pointer;"></span>'
+                        + '<span class="fa fa-stumbleupon" style="cursor:pointer;"></span>'
+                        + '<span class="fa fa-stumbleupon-circle" style="cursor:pointer;"></span>'
+                        + '<span class="fa fa-superpowers" style="cursor:pointer;"></span>'
+                        + '<span class="fa fa-telegram" style="cursor:pointer;"></span>'
+                        + '<span class="fa fa-tencent-weibo" style="cursor:pointer;"></span>'
+                        + '<span class="fa fa-themeisle" style="cursor:pointer;"></span>'
+                        + '<span class="fa fa-trello" style="cursor:pointer;"></span>'
+                        + '<span class="fa fa-tripadvisor" style="cursor:pointer;"></span>'
+                        + '<span class="fa fa-tumblr" style="cursor:pointer;"></span>'
+                        + '<span class="fa fa-tumblr-square" style="cursor:pointer;"></span>'
+                        + '<span class="fa fa-leanpub" style="cursor:pointer;"></span>'
+                        + '<span class="fa fa-snapchat" style="cursor:pointer;"></span>'
+                        + '<span class="fa fa-snapchat-ghost" style="cursor:pointer;"></span>'
+                        + '<span class="fa fa-snapchat-square" style="cursor:pointer;"></span>'
+                        + '<span class="fa fa-soundcloud" style="cursor:pointer;"></span>'
+                        + '<span class="fa fa-spotify" style="cursor:pointer;"></span>'
+                        + '<span class="fa fa-stack-exchange" style="cursor:pointer;"></span>'
+                        + '<span class="fa fa-stack-overflow" style="cursor:pointer;"></span>'
+                        + '<span class="fa fa-steam" style="cursor:pointer;"></span>'
+                        + '<span class="fa fa-steam-square" style="cursor:pointer;"></span>'
+                        + '<span class="fa fa-wpforms" style="cursor:pointer;"></span>'
+                        + '<span class="fa fa-xing" style="cursor:pointer;"></span>'
+                        + '<span class="fa fa-xing-square" style="cursor:pointer;"></span>'
+                        + '</div></li></ul></div>';
+
+        //아이콘 버튼 만들기
+        function createIcon() {
+            return icons;
+        }
+
+        //아이콘 값 get, set
+        //get은 Sumbit했을때 사용할 값을 리턴 해주면된다.
+        function customValue(elem, operation, value) {
+            if (operation === 'get') {
+                if ($(elem).length > 0) {
+                    return $(elem).find('label').text();
+                } else {
+                    return $(elem).val();
+                }
+            } else if (operation === 'set') {
+                $(elem).val(value);
+                selectedIcon = value;
+            }
+        }
+
+        //라디오 버튼(isUse) 만들기
+        function createRadio(value, options) {
+            var use = '<span><input type="radio" id="radio-use" name="RadioIsUse" value="1"'
+                , endUse = '/><label for="radio-use" style="margin-bottom:0px;">사용</label>'
+                , unUse = '&nbsp;<input type="radio" id="radio-unUse" name="RadioIsUse" value="0"'
+                , endUnUse = '/><label for="radio-unUse" style="margin-bottom:0px;">중지</label></span>'
+                , radios = '';
+
+            // 기본 구성은 use + (체크?) + endUse + unUse + (체크?) + endUnUse 로 구성됨.
+            // *여기서 (체크?)는 value에 따라 체크해주는 코드.
+
+            // O or "" 인 경우 사용으로 간주하고, use 다음에 checked를 넣어줌.
+            // X 인 경우 사용으로 간주하고, unUse 다음에 checked를 넣어줌.
+            // 둘 다 아닌경우는 사용을 기본 선택으로 함.
+            if (value == "O" || value == "") {
+                radios = use + ' checked="checked"' + endUse + unUse + endUnUse;
+            } else if(value == "X") {
+                radios = use + endUse + unUse + ' checked="checked"' + endUnUse;
+            } else {
+                radios = use + ' checked="checked"' + endUse + unUse + endUnUse;
+            }
+            return radios;
+        }
+
+        //라디오 버튼 값 가져오기.
+        //get은 Sumbit했을때 사용할 값을 리턴 해주면된다.
+        function RadioValue(elem, operation, value) {
+            var $elems = $(elem).find("input[name=RadioIsUse]");
+            if ($elems.length > 0) {
+                if (operation === "get") {
+                    if (selectedIsUse) {
+                        return $elems.siblings('#' + selectedIsUse).val();
+                        //return $elems.find('#'+selectedIsUse).val();
+                    } else {
+                        return $elems.val();
+                    }
+                } else if (operation === "set") {
+                    $elems.val(value);
+                }
+            }
+        }
+
+        //라디오 버튼(isUse) 만들기
+        function createCategoryRadio(value, options) {
+            var use = '<span><input type="radio" id="radio-menu" name="RadioCategory" value="Menu"'
+                , endUse = '/><label for="radio-menu" style="margin-bottom:0px;">메뉴</label>'
+                , unUse = '&nbsp;<input type="radio" id="radio-item" name="RadioCategory" value="Item"'
+                , endUnUse = '/><label for="radio-item" style="margin-bottom:0px;">페이지</label></span>'
+                , radios = '';
+
+            // 기본 구성은 use + (체크?) + endUse + unUse + (체크?) + endUnUse 로 구성됨.
+            // *여기서 (체크?)는 value에 따라 체크해주는 코드.
+
+            // 메뉴(Menu) or "" 인 경우 사용으로 간주하고, use 다음에 checked를 넣어줌.
+            // 페이지(Item) 인 경우 사용으로 간주하고, unUse 다음에 checked를 넣어줌.
+            // 둘 다 아닌경우는 사용을 기본 선택으로 함.
+            if (value == "메뉴" || value == "") {
+                radios = use + ' checked="checked"' + endUse + unUse + endUnUse;
+            } else if (value == "페이지") {
+                radios = use + endUse + unUse + ' checked="checked"' + endUnUse;
+            } else {
+                radios = use + ' checked="checked"' + endUse + unUse + endUnUse;
+            }
+            return radios;
+        }
+        //라디오 카테고리 버튼 값 가져오기.
+        function RadioCategoryValue(elem, operation, value) {
+            var $elems = $(elem).find("input[name=RadioCategory]");
+            if ($elems.length > 0) {
+                if (operation === "get") {
+                    if (selectedCategory) {
+                        return $elems.siblings('#' + selectedCategory).val();
+                        //return $elems.find('#'+selectedCategory).val();
+                    } else {
+                        return $elems.val();
+                    }
+                } else if (operation === "set") {
+                    $elems.val(value);
+                }
+            }
+        }
+
+        //그리드 추가버튼 아이콘
+        function formatIcon(cellValue, options, rowObject) {
+            var iconHtml
+            if (cellValue == "") {
+                iconHtml = cellValue;
+            } else {
+                iconHtml = "<i class='" + cellValue + "' aria-hidden='true' style='font-size:1.3rem;'></i>" + "<span> (" + cellValue + ")</span>";
+            }
+
+            return iconHtml;
+        }
+
+        var paramGrid1 = {
+            Url: '../System/GetLargeMenu',
+            ColName: ['', '@Resource.ParentMenuCode', '@Resource.MenuCode', '@Resource.MenuName', '@Resource.Description', '@Resource.Sequence', '@Resource.Controller', '@Resource.ActionMethod', '@Resource.Category', '@Resource.IconValue', '@Resource.Icon', '@Resource.IsUse'],
+            ColModel: [{
+                name: 'id', index: 'id', width: '8%', formatter: 'actions', editable: false, formatoptions: {
+                    editformbutton: true,
+                    editOptions: {
+                        modal: true,
+                        url: '../System/RootEdit',
+                        closeOnEscape: true,
+                        closeAfterEdit: true,
+                        recreateForm: true,
+                        beforeInitData: function (formid) {
+///////////////////////////////     Edit    //////////////////////////////////////
+                            $("#MenuEdit-Grid1").jqGrid('setColProp', 'ParentMenuCode', { editoptions: { defaultValue: 'Root', readonly: 'readonly' } });
+                            $("#MenuEdit-Grid1").jqGrid('setColProp', 'MenuCode', { editoptions: { readonly: 'readonly' } });
+                            $("#MenuEdit-Grid1").jqGrid("setColProp", "IconValue", {
+                                edittype: 'custom',
+                                editoptions: {
+                                    custom_element: createIcon,
+                                    custom_value: customValue,
+                                    dataInit: function (elem) {
+
+                                        $("#select-icon").text(selectedIcon);
+                                    },
+                                    dataEvents: [
+                                        {
+                                            type: 'click',
+                                            fn: function (e, s) {
+                                                var selects = $(e.target).attr('class');
+
+                                                if (selects.match('fa ')) {
+                                                    $("#select-icon").text(selects);
+                                                    var form = $(e.target).closest('form.FormGrid');
+                                                    $("div#IconValue.customelement", form[0]).val(selects);
+                                                } else {
+                                                    console.log("중단");
+                                                    e.preventDefault();
+                                                }
+
+                                            }
+                                        }
+                                    ]
+                                }
+
+                            });
+
+                            //이곳은 Edit버튼(수정)을 눌렀을때 타는 로직이다.
+                            //_MenuEditContext.cshtml에 이와 유사한 로직이 있는데, 그것은 '추가'할 때의 로직이다.
+                            //그러므로 둘 다 추가해줘야 한다.
+                            $("#MenuEdit-Grid1").jqGrid("setColProp", "Category", {
+                                edittype: 'custom',
+                                editoptions: {
+                                    custom_element: createCategoryRadio,
+                                    custom_value: RadioCategoryValue,
+                                    dataInit: function (elem) {
+
+                                    },
+                                    dataEvents: [
+                                        {
+                                            type: 'change',
+                                            fn: function (e) {
+                                                //if ($(e.target).is('input')) {
+                                                selectedCategory = $(e.target).attr('id');
+                                                var vals = $(e.target).attr('value')
+                                                    , form = $(e.target).closest('form.FormGrid');
+
+                                                $("span#Category.customelement", form[0]).val(vals);
+                                                if (vals == "Menu") {
+                                                    //초기화
+                                                    //$("#Controller").val('');
+                                                    //$("#Controller").attr("readonly", true);
+                                                    //$("#Controller").css('cursor', 'not-allowed');
+                                                    $("#ActionMethod").val('');
+                                                    $("#ActionMethod").attr("readonly", true);
+                                                    $("#ActionMethod").css('cursor', 'not-allowed');
+                                                } else if (vals == "Item") {
+                                                    //$("#Controller").attr("readonly", false);
+                                                    //$("#Controller").css('cursor', 'auto');
+                                                    $("#ActionMethod").attr("readonly", false);
+                                                    $("#ActionMethod").css('cursor', 'auto');
+                                                }
+                                                //}
+                                                //} else {
+
+                                                //}
+                                            }
+                                        }
+                                    ]
+                                }
+                            });
+                            $("#MenuEdit-Grid1").jqGrid("setColProp", "IsUse", {
+                                edittype: 'custom',
+                                editoptions: {
+                                    custom_element: createRadio,
+                                    custom_value: RadioValue,
+                                    dataInit: function (elem) {
+
+                                    },
+                                    dataEvents: [
+                                        {
+                                            type: 'click',
+                                            fn: function (e) {
+                                                if ($(e.target).is('input')) {
+                                                    selectedIsUse = $(e.target).attr('id');
+                                                    var vals = $(e.target).attr('value')
+                                                        ,form = $(e.target).closest('form.FormGrid');
+                                                    $("span#IsUse.customelement", form[0]).val(vals);
+                                                } else {
+
+                                                }
+                                            }
+                                        }
+                                    ]
+                                }
+                            });
+                        },
+///////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+                        afterShowForm: function (m) {
+                            $("#select-icon").text(selectedIcon);
+                            $("#MenuEdit-Grid1").jqGrid("setColProp", "IconValue", { value: selectedIcon });
+                        },
+                        afterComplete: function (response) {
+                            if (response.responseText) {
+                                alert(response.responseText);
+                                //재조회
+                                $("#MenuEdit-Grid1").setGridParam({ datatype: 'json', page: 1 }).trigger('reloadGrid');
+                            }
+                        }
+                    },
+
+
+                    // 컨트롤러의 삭제 함수로 보내는 파라미터 수정?생성
+                    // id, oper은 필수로 함께 보내야한다. 안그러면 추가한 다른 파라미터를 못받아옴.
+                    //
+                    // ex) return { id : das.id, oper : das.oper, menuCode: $(this).jqGrid("getRowData", das.id).MenuCode, parentMenuCode: $(this).jqGrid("getRowData", das.id).ParentMenuCode };
+                    // 여기서 das.id = 현재 그리드의 key값. 이 key값으로 현재 선택한 row의 column을 받아올 수 있당.
+                    // $(this).jqGrid("getRowData", das.id).칼럼이름   을 사용하면 값을 받아올 수 있당.
+                    delOptions: {
+                        zIndex: 100,
+                        url: "../System/Delete",
+                        closeOnEscape: true,
+                        closeAfterDelete: true,
+                        recreateForm: true,
+                        mtype: "POST",
+                        msg: "선택 항목을 삭제하시겠습니까?",
+
+                        serializeDelData: function (das) {
+                            console.log(das);
+                            return { id: das.id, oper: das.oper, menuCode: $(this).jqGrid("getRowData", das.id).MenuCode, parentMenuCode: $(this).jqGrid("getRowData", das.id).ParentMenuCode };
+                        },
+                        afterComplete: function (response) {
+                            if (response.responseText) {
+                                alert(response.responseText);
+                            }
+                        }
+                    }
+                }
+            }
+
+                , { key: false, width: '7%', hidden: false, name: 'ParentMenuCode', index: 'ParentMenuCode', editable: true }
+                , { key: true, width: '9%', hidden: false, name: 'MenuCode', index: 'MenuCode', editable: true, editrules: { required: true } }
+                , { key: false, width: '15%', name: 'MenuName', index: 'MenuName', editable: true, editrules: { required: true } }
+                , { key: false, width: '17%', name: 'Description', index: 'Description', editable: true }
+                , { key: false, width: '5%', name: 'Sequence', index: 'Sequence', align: 'right', editable: true, editrules: { required: true } }
+                , { key: false, width: '9%', name: 'Controller', index: 'Controller', editable: true, editrules: { required: true } }
+                , { key: false, width: '9%', name: 'ActionMethod', index: 'ActionMethod', editable: true }
+                , { key: false, width: '5%', name: 'Category', index: 'Category', align: 'center', editable: true, editrules: { required: true } }
+                , { key: false, name: 'IconValue', index: 'IconValue', editable: true, hidden: true, editrules: { edithidden: true } }
+                , { key: false, width: '14%', name: 'Icon', index: 'Icon', editable: false, formatter: formatIcon }
+                , { key: false, width: '7%', name: 'IsUse', index: 'IsUse', align: 'center', editable: true, editrules: { required: true } }
+
+            ],
+            RowNum: 100,
+            RowList: [20, 50, 100, 200, 300, 500]
+        }
+
+        var paramGrid2 = {
+            Url: '../System/GetMediumMenu',
+            ColName: ['', '@Resource.ParentMenuCode', '@Resource.MenuCode', '@Resource.MenuName', '@Resource.Description', '@Resource.Sequence', '@Resource.Controller', '@Resource.ActionMethod','@Resource.Category', '@Resource.IconValue', '@Resource.Icon', '@Resource.IsUse'],
+            ColModel: [{
+                name: 'id', index: 'id', width: '8%', formatter: 'actions', editable: false, formatoptions: {
+                    editformbutton: true,
+                    editOptions: {
+                        modal: true,
+                        url: '../System/SubEdit',
+                        closeOnEscape: true,
+                        closeAfterEdit: true,
+                        recreateForm: true,
+                        beforeInitData: function (formid) {
+                            $("#MenuEdit-Grid2").jqGrid('setColProp', 'ParentMenuCode', { editoptions: { defaultValue: 'Root', readonly: 'readonly' } });
+                            $("#MenuEdit-Grid2").jqGrid('setColProp', 'MenuCode', { editoptions: { readonly: 'readonly' } });
+                            $("#MenuEdit-Grid2").jqGrid("setColProp", "IconValue", {
+                                edittype: 'custom',
+                                editoptions: {
+                                    custom_element: createIcon,
+                                    custom_value: customValue,
+                                    dataInit: function (elem) {
+
+                                        $("#select-icon").text(selectedIcon);
+                                    },
+                                    dataEvents: [
+                                        {
+                                            type: 'click',
+                                            fn: function (e, s) {
+                                                var selects = $(e.target).attr('class');
+
+                                                if (selects.match('fa ')) {
+                                                    $("#select-icon").text(selects);
+                                                    var form = $(e.target).closest('form.FormGrid');
+                                                    $("div#IconValue.customelement", form[0]).val(selects);
+                                                } else {
+                                                    console.log("중단");
+                                                    e.preventDefault();
+                                                }
+                                            }
+                                        }
+                                    ]
+                                }
+
+                            });
+                            $("#MenuEdit-Grid2").jqGrid("setColProp", "Category", {
+                                edittype: 'custom',
+                                editoptions: {
+                                    custom_element: createCategoryRadio,
+                                    custom_value: RadioCategoryValue,
+                                    dataInit: function (elem) {
+
+                                    },
+                                    dataEvents: [
+                                        {
+                                            type: 'change',
+                                            fn: function (e) {
+                                                //if ($(e.target).is('input')) {
+                                                selectedCategory = $(e.target).attr('id');
+                                                var vals = $(e.target).attr('value')
+                                                    , form = $(e.target).closest('form.FormGrid');
+
+                                                $("span#Category.customelement", form[0]).val(vals);
+                                                if (vals == "Menu") {
+                                                    //초기화
+                                                    //$("#Controller").val('');
+                                                    //$("#Controller").attr("readonly", true);
+                                                    //$("#Controller").css('cursor', 'not-allowed');
+                                                    $("#ActionMethod").val('');
+                                                    $("#ActionMethod").attr("readonly", true);
+                                                    $("#ActionMethod").css('cursor', 'not-allowed');
+                                                } else if (vals == "Item") {
+                                                    //$("#Controller").attr("readonly", false);
+                                                    //$("#Controller").css('cursor', 'auto');
+                                                    $("#ActionMethod").attr("readonly", false);
+                                                    $("#ActionMethod").css('cursor', 'auto');
+                                                }
+                                                //}
+                                                //} else {
+
+                                                //}
+                                            }
+                                        }
+                                    ]
+                                }
+                            });
+                            $("#MenuEdit-Grid2").jqGrid("setColProp", "IsUse", {
+                                edittype: 'custom',
+                                editoptions: {
+                                    custom_element: createRadio,
+                                    custom_value: RadioValue,
+                                    dataInit: function (elem) {
+
+                                    },
+                                    dataEvents: [
+                                        {
+                                            type: 'click',
+                                            fn: function (e) {
+                                                if ($(e.target).is('input')) {
+                                                    selectedIsUse = $(e.target).attr('id');
+                                                    var vals = $(e.target).attr('value')
+                                                        , form = $(e.target).closest('form.FormGrid');
+                                                    $("span#IsUse.customelement", form[0]).val(vals);
+                                                } else {
+
+                                                }
+                                            }
+                                        }
+                                    ]
+                                }
+                            });
+                        },
+                        afterShowForm: function (m) {
+                            $("#select-icon").text(selectedIcon);
+                            $("#MenuEdit-Grid2").jqGrid("setColProp", "IconValue", { value: selectedIcon });
+                        },
+                        afterComplete: function (response) {
+                            if (response.responseText) {
+                                alert(response.responseText);
+                                //재조회
+                                $("#MenuEdit-Grid2").setGridParam({ datatype: 'json', page: 1 }).trigger('reloadGrid');
+                            }
+                        }
+                    },
+                    delOptions: {
+                        zIndex: 100,
+                        url: "../System/Delete",
+                        closeOnEscape: true,
+                        closeAfterDelete: true,
+                        recreateForm: true,
+                        mtype: "POST",
+                        msg: "선택 항목을 삭제하시겠습니까?",
+
+                        serializeDelData: function (das) {
+                            console.log(das);
+                            return { id: das.id, oper: das.oper, menuCode: $(this).jqGrid("getRowData", das.id).MenuCode, parentMenuCode: $(this).jqGrid("getRowData", das.id).ParentMenuCode };
+                        },
+                        afterComplete: function (response) {
+                            if (response.responseText) {
+                                alert(response.responseText);
+                            }
+                        }
+                    }
+                }
+            }
+
+                , { key: false, width: '8%', hidden: false, name: 'ParentMenuCode', index: 'ParentMenuCode', editable: true }
+                , { key: true, width: '11%', hidden: false, name: 'MenuCode', index: 'MenuCode', editable: true, editrules: { required: true } }
+                , { key: false, width: '15%', name: 'MenuName', index: 'MenuName', editable: true, editrules: { required: true } }
+                , { key: false, width: '15%', name: 'Description', index: 'Description', editable: true }
+                , { key: false, width: '5%', name: 'Sequence', index: 'Sequence', align: 'right', editable: true, editrules: { required: true } }
+                , { key: false, width: '8%', name: 'Controller', index: 'Controller', editable: true, editrules: { required: true } }
+                , { key: false, width: '11%', name: 'ActionMethod', index: 'ActionMethod', editable: true }
+                , { key: false, width: '5%', name: 'Category', index: 'Category', align: 'center', editable: true, editrules: { required: true } }
+                , { key: false, name: 'IconValue', index: 'IconValue', editable: true, hidden: true, editrules: { edithidden: true } }
+                , { key: false, width: '12%', name: 'Icon', index: 'Icon', editable: false, formatter: formatIcon }
+                , { key: false, width: '7%', name: 'IsUse', index: 'IsUse', align: 'center', editable: true, editrules: { required: true } }
+
+            ],
+            RowNum: 100,
+            RowList: [20, 50, 100, 200, 300, 500]
+        }
+
+        var paramGrid3 = {
+            Url: '../System/GetSmallMenu',
+            ColName: ['', '@Resource.ParentMenuCode', '@Resource.MenuCode', '@Resource.MenuName', '@Resource.Description', '@Resource.Sequence', '@Resource.Controller', '@Resource.ActionMethod', '@Resource.Category', '@Resource.IsUse'],
+            ColModel: [{
+                name: 'id', index: 'id', width: '8%', formatter: 'actions', editable: false, formatoptions: {
+                    editformbutton: true,
+                    editOptions: {
+                        modal: true,
+                        url: '../System/SubEdit',
+                        closeOnEscape: true,
+                        closeAfterEdit: true,
+                        recreateForm: true,
+                        beforeInitData: function (formid) {
+                            $("#MenuEdit-Grid3").jqGrid('setColProp', 'ParentMenuCode', { editoptions: { defaultValue: 'Root', readonly: 'readonly' } });
+                            $("#MenuEdit-Grid3").jqGrid('setColProp', 'MenuCode', { editoptions: { readonly: 'readonly' } });
+                            $("#MenuEdit-Grid3").jqGrid("setColProp", "Category", {
+                                edittype: 'custom',
+                                editoptions: {
+                                    custom_element: createCategoryRadio,
+                                    custom_value: RadioCategoryValue,
+                                    dataInit: function (elem) {
+
+                                    },
+                                    dataEvents: [
+                                        {
+                                            type: 'change',
+                                            fn: function (e) {
+                                                //if ($(e.target).is('input')) {
+                                                selectedCategory = $(e.target).attr('id');
+                                                var vals = $(e.target).attr('value')
+                                                    , form = $(e.target).closest('form.FormGrid');
+
+                                                $("span#Category.customelement", form[0]).val(vals);
+                                                if (vals == "Menu") {
+                                                    //초기화
+                                                    //$("#Controller").val('');
+                                                    //$("#Controller").attr("readonly", true);
+                                                    //$("#Controller").css('cursor', 'not-allowed');
+                                                    $("#ActionMethod").val('');
+                                                    $("#ActionMethod").attr("readonly", true);
+                                                    $("#ActionMethod").css('cursor', 'not-allowed');
+                                                } else if (vals == "Item") {
+                                                    //$("#Controller").attr("readonly", false);
+                                                    //$("#Controller").css('cursor', 'auto');
+                                                    $("#ActionMethod").attr("readonly", false);
+                                                    $("#ActionMethod").css('cursor', 'auto');
+                                                }
+                                                //}
+                                                //} else {
+
+                                                //}
+                                            }
+                                        }
+                                    ]
+                                }
+                            });
+                            $("#MenuEdit-Grid3").jqGrid("setColProp", "IsUse", {
+                                edittype: 'custom',
+                                editoptions: {
+                                    custom_element: createRadio,
+                                    custom_value: RadioValue,
+                                    dataInit: function (elem) {
+
+                                    },
+                                    dataEvents: [
+                                        {
+                                            type: 'click',
+                                            fn: function (e) {
+                                                if ($(e.target).is('input')) {
+                                                    selectedIsUse = $(e.target).attr('id');
+                                                    var vals = $(e.target).attr('value')
+                                                        , form = $(e.target).closest('form.FormGrid');
+                                                    $("span#IsUse.customelement", form[0]).val(vals);
+                                                } else {
+
+                                                }
+                                            }
+                                        }
+                                    ]
+                                }
+                            });
+                        },
+                        afterComplete: function (response) {
+                            if (response.responseText) {
+                                alert(response.responseText);
+                                //재조회
+                                $("#MenuEdit-Grid3").setGridParam({ datatype: 'json', page: 1 }).trigger('reloadGrid');
+                            }
+                        }
+                    },
+                    delOptions: {
+                        zIndex: 100,
+                        url: "../System/Delete",
+                        closeOnEscape: true,
+                        closeAfterDelete: true,
+                        recreateForm: true,
+                        mtype: "POST",
+                        msg: "선택 항목을 삭제하시겠습니까?",
+
+                        serializeDelData: function (das) {
+                            console.log(das);
+                            return { id: das.id, oper: das.oper, menuCode: $(this).jqGrid("getRowData", das.id).MenuCode, parentMenuCode: $(this).jqGrid("getRowData", das.id).ParentMenuCode };
+                        },
+                        afterComplete: function (response) {
+                            if (response.responseText) {
+                                alert(response.responseText);
+                            }
+                        }
+                    }
+                }
+            }
+
+                , { key: false, width: '10%', hidden: false, name: 'ParentMenuCode', index: 'ParentMenuCode', editable: true }
+                , { key: true, width: '12%', hidden: false, name: 'MenuCode', index: 'MenuCode', editable: true, editrules: { required: true } }
+                , { key: false, width: '15%', name: 'MenuName', index: 'MenuName', editable: true, editrules: { required: true } }
+                , { key: false, width: '18%', name: 'Description', index: 'Description', editable: true }
+                , { key: false, width: '5%', name: 'Sequence', index: 'Sequence', align: 'right', editable: true, editrules: { required: true } }
+                , { key: false, width: '13%', name: 'Controller', index: 'Controller', editable: true, editrules: { required: true } }
+                , { key: false, width: '12%', name: 'ActionMethod', index: 'ActionMethod', editable: true }
+                , { key: false, width: '5%', name: 'Category', index: 'Category', align: 'center', editable: true, editrules: { required: true } }
+                , { key: false, width: '7%', name: 'IsUse', index: 'IsUse', align: 'center', editable: true, editrules: { required: true } }
+
+            ],
+            RowNum: 100,
+            RowList: [20, 50, 100, 200, 300, 500]
+        }
+
+        $(document).ready(function () {
+            showGrid1();
+            $(':input:checked').parent('.btn').addClass('active');
+        });
+</script>
+}

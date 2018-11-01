@@ -1,0 +1,154 @@
+﻿<div class="modal-body">
+    <div></div>
+    <div>
+        <div class="filebox" style="margin-bottom:5px;">
+            <input class="upload-filename" id="excelFilename" disabled="disabled">
+            <label for="files" class="btn-primary">파일선택</label>
+            <input name="hid" class="upload-hidden" type="file" id="files">
+            <label class="btn-primary" id="excelUpload"><i class="fa fa-arrow-circle-o-up" aria-hidden="true"></i>업로드</label>
+        </div>
+
+        <div class="ibox-content">
+            <table id="Excel" cellpadding="0" cellspacing="0"></table>
+            <div id="Excel-Pager" style="text-align: center;">
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+
+    //엑셀 업로드
+    $('#excelUpload').on("click", function () {
+        var parameter = '';
+        result.forEach(function (y) {
+            parameter += (parameter == '') ? JSON.stringify(Object.values(y)).replace('[', '').replace(']', '').replace(/"/gi, '') : '&' + JSON.stringify(Object.values(y)).replace('[', '').replace(']', '').replace(/"/gi, '')
+        });
+
+        //alert(parameter);
+
+        $.post('../Master/ExcelUpload', { plantId: $('#Plants').val(), workshopId: $('#Workshops').val(), parameters: parameter }
+            , function (data) {
+                if (data == "Success") {
+
+                    excelClear();
+                    swal({
+                        title: "알림",
+                        text: "업로드 완료",
+                        type: "success"
+                    });
+                    $('#ExcelUploadModal').modal('close');
+                }
+                else {
+                    swal({
+                        title: "알림",
+                        text: "업로드 실패",
+                        type: "error"
+                    });
+                }
+            });
+    });
+
+    //엑셀 업로드 창 초기화
+    function excelClear() {
+        $('#files').val('');
+        $('#excelFilename').val('');
+        $('#Excel').empty();
+    };
+
+    //엑셀 파일선택
+    $('#files').on('change', function (e) {
+        console.log(e);
+
+        // 값이 변경되면
+        if (window.FileReader) { // modern browser
+            if ($(this)[0].files.length > 0) {
+                filename = $(this)[0].files[0].name;
+            } else {
+                filename = '';
+            }
+        } else { // old IE
+            filename = $(this).val().split('/').pop().split('\\').pop(); // 파일명만 추출
+        }
+
+        if ($(this)[0].files[0].name.split(".").pop() == "xlsx" || $(this)[0].files[0].name.split(".").pop() == "xls") {
+
+            $('#excelFilename').val(filename);
+            var files = e.target.files, f = files[0];
+            var rABS = true; // true: readAsBinaryString ; false: readAsArrayBuffer
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                var data = e.target.result;
+                if (!rABS) data = new Uint8Array(data);
+
+                var workbook = XLSX.read(data, { type: rABS ? 'binary' : 'array' });
+
+                //워크시트 로직 여기에
+                var sheet_name_list = workbook.SheetNames;
+                sheet_name_list.forEach(function (y) { /* iterate through sheets */
+
+                    //변환 cell value to Json
+                    var roa = XLSX.utils.sheet_to_json(workbook.Sheets[y]);
+                    if (roa.length > 0) {
+                        result = roa;
+                    }
+                });
+                var colModel = [];
+
+                Object.keys(result[0]).forEach(function (c) {
+                    colModel.push({ key: false, width: 100 / Object.keys(result[0]).length + "%", name: c, index: c, align: 'left' });
+                })
+
+                $("#Excel").GridUnload();
+                //그리드 출력
+                ShowExcelGrid(Object.keys(result[0]), colModel, result);
+            };
+            if (rABS) reader.readAsBinaryString(f); else reader.readAsArrayBuffer(f);
+        }
+    });
+
+    function ShowExcelGrid(colNames,colModel,datas) {
+
+        $("#Excel").jqGrid
+        ({
+            datatype: "local",
+            //colModel takes the data from controller and binds to grid
+            colModel: colModel,
+            //table header name
+            colNames: colNames,
+            data: datas,
+            hidegrid: true,
+            loadonce: true, //이놈을 true주면 리로드가안됨..찾아볼것. true를안주면 하단 page버튼이 활성화안됨..결국 true를 주고 재조회를 수동으로해야할듯!
+            navOptions: { reloadGridOptions: { fromServer: true } },
+            loadtext: 'Loading...',
+            rownumbers: true,
+            //pager 기능을 탑에 복사(하단 cloneToTop: true 필요)
+            //toppager: true,
+            shrinkToFit: true,
+            loadComplete: function () {
+                $("#Excel").setSelection($("#Excel").getDataIDs()[0], true);
+            },
+            gridComplete: function () {
+            },
+            pager: jQuery('#Excel-Pager'),
+            rowNum: 50,
+            rowList: [50, 100, 150, 200],
+            height: '100%',
+            viewrecords: true,
+            emptyrecords: 'No records to display',
+            autowidth: true,
+            multiselect: false,
+            gridview: true
+        }).navGrid('#Excel-Pager',
+        {
+            //pager 기능을 탑에 복사 (상단 toppager: true 필요)
+            //cloneToTop: true,
+            edit: false,
+            add: false,
+            del: false,
+            search: false,
+            refresh: false
+        });
+    }
+
+</script>

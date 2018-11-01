@@ -1,0 +1,567 @@
+﻿@using RecoWeb.Domain.LocalResource
+
+<div class="col-lg-6 col-md-6 h-100">
+    <div class="ibox">
+        <div class="ibox-title">
+            <span style="font-size:1.4rem;"><i class="fa fa-list-alt" aria-hidden="true"></i>&nbsp;@Resource.LargeMenu</span>
+        </div>
+        <div class="ibox-content">
+            <table id="MenuEdit-Grid1" cellpadding="0" cellspacing="0"></table>
+            <div id="MenuEdit-Pager1" style="text-align: center;">
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="col-lg-6 col-md-6 h-100">
+    <div>
+        <div class="ibox">
+            <div class="ibox-title">
+                <span style="font-size:1.4rem;"><i class="fa fa-list-ul" aria-hidden="true"></i>&nbsp;@Resource.MiddleMenu</span>
+            </div>
+            <div class="ibox-content">
+                <table id="MenuEdit-Grid2" cellpadding="0" cellspacing="0"></table>
+                <div id="MenuEdit-Pager2" style="text-align: center;">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div>
+        <div class="ibox">
+            <div class="ibox-title">
+                <span style="font-size:1.4rem;"><i class="fa fa-th-list" aria-hidden="true"></i>&nbsp;@Resource.SmallMenu</span>
+            </div>
+            <div class="ibox-content">
+                <table id="MenuEdit-Grid3" cellpadding="0" cellspacing="0"></table>
+                <div id="MenuEdit-Pager3" style="text-align: center;">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    function showGrid1() {
+        //그리드 서 ㄴ언
+        $("#MenuEdit-Grid1").jqGrid
+        ({
+            url: paramGrid1.Url,
+            datatype: 'json',
+            mtype: 'GET',
+            //파라메타
+            postData: {
+                isUse: $("input[name='isUse']:checked").val()
+            },
+            hidegrid: true,
+            loadonce: true, //이놈을 true주면 리로드가안됨..찾아볼것. true를안주면 하단 page버튼이 활성화안됨..결국 true를 주고 재조회를 수동으로해야할듯!
+            navOptions: { reloadGridOptions: { fromServer: true } },
+            loadtext: 'Loading...',
+            rownumbers: true,
+            //pager 기능을 탑에 복사(하단 cloneToTop: true 필요)
+            //toppager: true,
+            shrinkToFit: true,
+            loadComplete: function () {
+                $("#MenuEdit-Grid1").setSelection($("#MenuEdit-Grid1").getDataIDs()[0], true);
+                showGrid2($("#MenuEdit-Grid1").getDataIDs()[0]);
+            },
+            gridComplete: function () {
+            },
+            //table header name
+            colNames: paramGrid1.ColName,
+            //colModel takes the data from controller and binds to grid
+            colModel: paramGrid1.ColModel,
+
+            onSelectRow: function (id) {
+                var rid = jQuery('#MenuEdit-Grid1').jqGrid("getGridParam", "selrow");
+                if (rid) {
+                    $("#MenuEdit-Grid2").clearGridData();
+                    $("#MenuEdit-Grid3").clearGridData();
+
+                    var row = jQuery('#MenuEdit-Grid1').jqGrid("getRowData", rid);
+                    var Urlstring = "../System/GetMediumMenu?IsUse=" + $("input[name='isUse']:checked").val() + "&largeMenuCode=" + row.MenuCode;
+
+                    $("#MenuEdit-Grid2").setGridParam({ datatype: 'json', page: 1, url: Urlstring }).trigger('reloadGrid');
+                }
+            },
+            pager: jQuery('#MenuEdit-Pager1'),
+            rowNum: paramGrid1.RowNum,
+            rowList: paramGrid1.RowList,
+            height: '100%',
+            viewrecords: true,
+            //caption: '대 메뉴',
+            emptyrecords: 'No records to display',
+            autowidth: true,
+            multiselect: false
+        }).navGrid('#MenuEdit-Pager1',
+     {
+         //pager 기능을 탑에 복사 (상단 toppager: true 필요)
+         //cloneToTop: true,
+         edit: false,
+         add: false,
+         del: false,
+         search: false,
+         refresh: false
+     });
+
+        ///////////////////////////////////////////    Add     ////////////////////////////////////////////////////
+        var btn = '<i class="fa fa-plus" aria-hidden="true" style="font-size:1.4rem;"></i>';
+        $("#MenuEdit-Grid1_id")[0].innerHTML = btn;
+        $($("#MenuEdit-Grid1_id")[0]).children('i').click(function (e) {
+            $("#MenuEdit-Grid1").editGridRow("new", {
+                // add options
+                zIndex: 100,
+                modal: true,
+                url: "../System/RootCreate",
+                closeOnEscape: true,
+                closeAfterAdd: true,
+                savekey: [true, 1],         //enter키
+                recreateForm: true,
+                beforeInitData: function (formid) {
+                    $("#MenuEdit-Grid1").jqGrid('setColProp', 'ParentMenuCode', { editoptions: { defaultValue: 'Root', readonly: 'readonly' } });
+                    $("#MenuEdit-Grid1").jqGrid("setColProp", "IconValue", {
+                        edittype: 'custom',
+                        editoptions: {
+                            custom_element: createIcon,
+                            custom_value: customValue,
+                            dataInit: function (elem) {
+                            },
+                            dataEvents: [
+                                {
+                                    type: 'click',
+                                    fn: function (e, s) {
+                                        var selects = $(e.target).attr('class');
+
+                                        if (selects.match('fa ')) {
+                                            $("#select-icon").text(selects);
+                                            var form = $(e.target).closest('form.FormGrid');
+                                            $("div#IconValue.customelement", form[0]).val(selects);
+                                        } else {
+                                            console.log("중단");
+                                            e.preventDefault();
+                                        }
+
+                                    }
+                                }
+                            ]
+                        }
+
+                    });
+                    //이곳은 +버튼(추가)을 눌렀을때 타는 로직이다.
+                    //MenuEdit.cshtml에 이와 유사한 로직이 있는데, 그것은 '수정'할 때의 로직이다.
+                    //그러므로 둘 다 추가해줘야 한다.
+                    $("#MenuEdit-Grid1").jqGrid("setColProp", "Category", {
+                        edittype: 'custom',
+                        editoptions: {
+                            custom_element: createCategoryRadio,
+                            custom_value: RadioCategoryValue,
+                            dataInit: function (elem) {
+
+                            },
+                            dataEvents: [
+                                {
+                                    type: 'change',
+                                    fn: function (e) {
+                                        //if ($(e.target).is('input')) {
+                                        selectedCategory = $(e.target).attr('id');
+                                        var vals = $(e.target).attr('value')
+                                            , form = $(e.target).closest('form.FormGrid');
+
+                                        $("span#Category.customelement", form[0]).val(vals);
+                                        if (vals == "Menu") {
+                                            //초기화
+                                            //$("#Controller").val('');
+                                            //$("#Controller").attr("readonly", true);
+                                            //$("#Controller").css('cursor', 'not-allowed');
+                                            $("#ActionMethod").val('');
+                                            $("#ActionMethod").attr("readonly", true);
+                                            $("#ActionMethod").css('cursor', 'not-allowed');
+                                        } else if (vals == "Item") {
+                                            //$("#Controller").attr("readonly", false);
+                                            //$("#Controller").css('cursor', 'auto');
+                                            $("#ActionMethod").attr("readonly", false);
+                                            $("#ActionMethod").css('cursor', 'auto');
+                                        }
+                                        //}
+                                        //} else {
+
+                                        //}
+                                    }
+                                }
+                            ]
+                        }
+                    });
+                    $("#MenuEdit-Grid1").jqGrid("setColProp", "IsUse", {
+                        edittype: 'custom',
+                        editoptions: {
+                            custom_element: createRadio,
+                            custom_value: RadioValue,
+                            dataInit: function (elem) {
+
+                            },
+                            dataEvents: [
+                                {
+                                    type: 'click',
+                                    fn: function (e) {
+                                        if ($(e.target).is('input')) {
+                                            selectedIsUse = $(e.target).attr('id');
+                                            var vals = $(e.target).attr('value')
+                                                , form = $(e.target).closest('form.FormGrid');
+                                            $("span#IsUse.customelement", form[0]).val(vals);
+                                        } else {
+
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    });
+                }, afterShowForm: function (m) {
+                    $("#select-icon").text(selectedIcon);
+                    $("#MenuEdit-Grid1").jqGrid("setColProp", "IconValue", { value: selectedIcon });
+                },
+                afterComplete: function (response) {
+                    if (response.responseText) {
+                        alert(response.responseText);
+                        //재조회
+                        $("#MenuEdit-Grid1").setGridParam({ datatype: 'json', page: 1 }).trigger('reloadGrid');
+                    }
+                }
+            });
+
+        })
+        ///////////////////////////////////////////////////////////////////////////////////////////////
+    }
+
+    function showGrid2(largeMenuCode) {
+        //그리드 선언
+        $("#MenuEdit-Grid2").jqGrid
+     ({
+         url: paramGrid2.Url,
+         datatype: 'json',
+         mtype: 'GET',
+         //파라메타
+         postData: {
+             isUse: $("input[name='isUse']:checked").val()
+             , largeMenuCode: largeMenuCode
+         },
+         hidegrid: true,
+         loadonce: true, //이놈을 true주면 리로드가안됨..찾아볼것. true를안주면 하단 page버튼이 활성화안됨..결국 true를 주고 재조회를 수동으로해야할듯!
+         navOptions: { reloadGridOptions: { fromServer: true } },
+         loadtext: 'Loading...',
+         rownumbers: true,
+         //pager 기능을 탑에 복사(하단 cloneToTop: true 필요)
+         //toppager: true,
+         shrinkToFit: true,
+         loadComplete: function () {
+             $("#MenuEdit-Grid2").setSelection($("#MenuEdit-Grid2").getDataIDs()[0], true);
+             showGrid3($("#MenuEdit-Grid2").getDataIDs()[0]);
+         },
+         gridComplete: function () {
+         },
+         //table header name
+         colNames: paramGrid2.ColName,
+         //colModel takes the data from controller and binds to grid
+         colModel: paramGrid2.ColModel,
+         onSelectRow: function (id) {
+             var rid = jQuery('#MenuEdit-Grid2').jqGrid("getGridParam", "selrow");
+             if (rid) {
+                 $("#MenuEdit-Grid3").clearGridData();
+
+                 var row = jQuery('#MenuEdit-Grid2').jqGrid("getRowData", rid);
+                 var Urlstring = "../System/GetSmallMenu?IsUse=" + $("input[name='isUse']:checked").val() + "&mediumParentMenuCode=" + row.MenuCode;
+                 $("#MenuEdit-Grid3").setGridParam({ datatype: 'json', page: 1, url: Urlstring }).trigger('reloadGrid');
+             }
+         },
+         pager: jQuery('#MenuEdit-Pager2'),
+         rowNum: paramGrid1.RowNum,
+         rowList: paramGrid1.RowList,
+         height: '100%',
+         viewrecords: true,
+         //caption: '대 메뉴',
+         emptyrecords: 'No records to display',
+         autowidth: true,
+         multiselect: false
+     }).navGrid('#MenuEdit-Pager2',
+     {
+         //pager 기능을 탑에 복사 (상단 toppager: true 필요)
+         //cloneToTop: true,
+         edit: false,
+         add: false,
+         del: false,
+         search: false,
+         refresh: false
+     });
+
+        var btn = '<i class="fa fa-plus" aria-hidden="true" style="font-size:1.4rem;"></i>';
+        $("#MenuEdit-Grid2_id")[0].innerHTML = btn;
+        $($("#MenuEdit-Grid2_id")[0]).children('i').click(function (e) {
+            $("#MenuEdit-Grid2").editGridRow("new", {
+                // add options
+                zIndex: 100,
+                modal: true,
+                url: "../System/SubCreate",
+                closeOnEscape: true,
+                closeAfterAdd: true,
+                savekey: [true, 1],         //enter키
+                recreateForm: true,
+                beforeInitData: function (formid) {
+                    $("#MenuEdit-Grid2").jqGrid('setColProp', 'ParentMenuCode', { editoptions: { defaultValue: $("#MenuEdit-Grid1").jqGrid('getGridParam', "selrow"), readonly: 'readonly' } });
+                    $("#MenuEdit-Grid2").jqGrid("setColProp", "IconValue", {
+                        edittype: 'custom',
+                        editoptions: {
+                            custom_element: createIcon,
+                            custom_value: customValue,
+                            dataInit: function (elem) {
+
+                                $("#select-icon").text(selectedIcon);
+                            },
+                            dataEvents: [
+                                {
+                                    type: 'click',
+                                    fn: function (e, s) {
+                                        var selects = $(e.target).attr('class');
+
+                                        if (selects.match('fa ')) {
+                                            $("#select-icon").text(selects);
+                                            var form = $(e.target).closest('form.FormGrid');
+                                            $("div#IconValue.customelement", form[0]).val(selects);
+                                        } else {
+                                            console.log("중단");
+                                            e.preventDefault();
+                                        }
+
+                                    }
+                                }
+                            ]
+                        }
+
+                    });
+
+                    $("#MenuEdit-Grid2").jqGrid("setColProp", "Category", {
+                        edittype: 'custom',
+                        editoptions: {
+                            custom_element: createCategoryRadio,
+                            custom_value: RadioCategoryValue,
+                            dataInit: function (elem) {
+
+                            },
+                            dataEvents: [
+                                {
+                                    type: 'change',
+                                    fn: function (e) {
+                                        //if ($(e.target).is('input')) {
+                                        selectedCategory = $(e.target).attr('id');
+                                        var vals = $(e.target).attr('value')
+                                            , form = $(e.target).closest('form.FormGrid');
+
+                                        $("span#Category.customelement", form[0]).val(vals);
+                                        if (vals == "Menu") {
+                                            //초기화
+                                            //$("#Controller").val('');
+                                            //$("#Controller").attr("readonly", true);
+                                            //$("#Controller").css('cursor', 'not-allowed');
+                                            $("#ActionMethod").val('');
+                                            $("#ActionMethod").attr("readonly", true);
+                                            $("#ActionMethod").css('cursor', 'not-allowed');
+                                        } else if (vals == "Item") {
+                                            //$("#Controller").attr("readonly", false);
+                                            //$("#Controller").css('cursor', 'auto');
+                                            $("#ActionMethod").attr("readonly", false);
+                                            $("#ActionMethod").css('cursor', 'auto');
+                                        }
+                                        //}
+                                        //} else {
+
+                                        //}
+                                    }
+                                }
+                            ]
+                        }
+                    });
+                    $("#MenuEdit-Grid2").jqGrid("setColProp", "IsUse", {
+                        edittype: 'custom',
+                        editoptions: {
+                            custom_element: createRadio,
+                            custom_value: RadioValue,
+                            dataInit: function (elem) {
+
+                            },
+                            dataEvents: [
+                                {
+                                    type: 'click',
+                                    fn: function (e) {
+                                        if ($(e.target).is('input')) {
+                                            selectedIsUse = $(e.target).attr('id');
+                                            var vals = $(e.target).attr('value')
+                                                , form = $(e.target).closest('form.FormGrid');
+                                            $("span#IsUse.customelement", form[0]).val(vals);
+                                        } else {
+
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    });
+                }, afterShowForm: function (m) {
+                    $("#select-icon").text(selectedIcon);
+                    $("#MenuEdit-Grid2").jqGrid("setColProp", "IconValue", { value: selectedIcon });
+                },
+                afterComplete: function (response) {
+                    if (response.responseText) {
+                        alert(response.responseText);
+                        //재조회
+                        $("#MenuEdit-Grid2").setGridParam({ datatype: 'json', page: 1 }).trigger('reloadGrid');
+                    }
+                }
+            });
+        })
+    }
+
+    function showGrid3(mediumParentMenuCode) {
+        //그리드 서 ㄴ언
+        $("#MenuEdit-Grid3").jqGrid
+        ({
+            url: paramGrid3.Url,
+            datatype: 'json',
+            mtype: 'GET',
+            //파라메타
+            postData: {
+                isUse: $("input[name='isUse']:checked").val()
+                , mediumParentMenuCode: mediumParentMenuCode
+            },
+            hidegrid: true,
+            loadonce: true, //이놈을 true주면 리로드가안됨..찾아볼것. true를안주면 하단 page버튼이 활성화안됨..결국 true를 주고 재조회를 수동으로해야할듯!
+            navOptions: { reloadGridOptions: { fromServer: true } },
+            loadtext: 'Loading...',
+            rownumbers: true,
+            //pager 기능을 탑에 복사(하단 cloneToTop: true 필요)
+            //toppager: true,
+            shrinkToFit: true,
+            loadComplete: function () {
+
+            },
+            //table header name
+            colNames: paramGrid3.ColName,
+            //colModel takes the data from controller and binds to grid
+            colModel: paramGrid3.ColModel,
+            onSelectRow: function (id) {
+                var rid = jQuery('#MenuEdit-Grid3').jqGrid("getGridParam", "selrow");
+                if (rid) {
+
+                    var row = jQuery('#MenuEdit-Grid3').jqGrid("getRowData", rid);
+                }
+            },
+            pager: jQuery('#MenuEdit-Pager3'),
+            rowNum: paramGrid1.RowNum,
+            rowList: paramGrid1.RowList,
+            height: '100%',
+            viewrecords: true,
+            emptyrecords: 'No records to display',
+            autowidth: true,
+            multiselect: false
+        }).navGrid('#MenuEdit-Pager3',
+        {
+            //pager 기능을 탑에 복사 (상단 toppager: true 필요)
+            //cloneToTop: true,
+            edit: false,
+            add: false,
+            del: false,
+            search: false,
+            refresh: false
+        });
+
+        var btn = '<i class="fa fa-plus" aria-hidden="true" style="font-size:1.4rem;"></i>';
+        $("#MenuEdit-Grid3_id")[0].innerHTML = btn;
+        $($("#MenuEdit-Grid3_id")[0]).children('i').click(function (e) {
+
+            $("#MenuEdit-Grid3").editGridRow("new", {
+                // add options
+                zIndex: 100,
+                modal: true,
+                url: "../System/SubCreate",
+                closeOnEscape: true,
+                closeAfterAdd: true,
+                savekey: [true, 1],         //enter키
+                recreateForm: true,
+                beforeInitData: function (formid) {
+                    $("#MenuEdit-Grid3").jqGrid('setColProp', 'ParentMenuCode', { editoptions: { defaultValue: $("#MenuEdit-Grid2").jqGrid('getGridParam', "selrow"), readonly: 'readonly' } });
+                    $("#MenuEdit-Grid3").jqGrid("setColProp", "Category", {
+                        edittype: 'custom',
+                        editoptions: {
+                            custom_element: createCategoryRadio,
+                            custom_value: RadioCategoryValue,
+                            dataInit: function (elem) {
+
+                            },
+                            dataEvents: [
+                                {
+                                    type: 'change',
+                                    fn: function (e) {
+                                        //if ($(e.target).is('input')) {
+                                        selectedCategory = $(e.target).attr('id');
+                                        var vals = $(e.target).attr('value')
+                                            , form = $(e.target).closest('form.FormGrid');
+
+                                        $("span#Category.customelement", form[0]).val(vals);
+                                        if (vals == "Menu") {
+                                            //초기화
+                                            //$("#Controller").val('');
+                                            //$("#Controller").attr("readonly", true);
+                                            //$("#Controller").css('cursor', 'not-allowed');
+                                            $("#ActionMethod").val('');
+                                            $("#ActionMethod").attr("readonly", true);
+                                            $("#ActionMethod").css('cursor', 'not-allowed');
+                                        } else if (vals == "Item") {
+                                            //$("#Controller").attr("readonly", false);
+                                            //$("#Controller").css('cursor', 'auto');
+                                            $("#ActionMethod").attr("readonly", false);
+                                            $("#ActionMethod").css('cursor', 'auto');
+                                        }
+                                        //}
+                                        //} else {
+
+                                        //}
+                                    }
+                                }
+                            ]
+                        }
+                    });
+                    $("#MenuEdit-Grid3").jqGrid("setColProp", "IsUse", {
+                        edittype: 'custom',
+                        editoptions: {
+                            custom_element: createRadio,
+                            custom_value: RadioValue,
+                            dataInit: function (elem) {
+
+                            },
+                            dataEvents: [
+                                {
+                                    type: 'click',
+                                    fn: function (e) {
+                                        if ($(e.target).is('input')) {
+                                            selectedIsUse = $(e.target).attr('id');
+                                            var vals = $(e.target).attr('value')
+                                                , form = $(e.target).closest('form.FormGrid');
+                                            $("span#IsUse.customelement", form[0]).val(vals);
+                                        } else {
+
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    });
+                },
+                afterComplete: function (response) {
+                    if (response.responseText) {
+                        alert(response.responseText);
+                        //재조회
+                        $("#MenuEdit-Grid3").setGridParam({ datatype: 'json', page: 1 }).trigger('reloadGrid');
+                    }
+                }
+            });
+        })
+    }
+</script>

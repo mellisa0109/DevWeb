@@ -1,0 +1,196 @@
+﻿@model RecoWeb.WebUI.Models.LotTraceTreeViewModel
+@using RecoWeb.Domain.LocalResource
+
+@{
+
+    AjaxOptions ajaxInquiry = new AjaxOptions
+    {
+        HttpMethod = "GET",
+        InsertionMode = InsertionMode.Replace,
+        OnSuccess = "ContextInquiry",
+        UpdateTargetId = "Context"
+
+    };
+}
+
+@* 화면의 조회조건이 표현되는 영역 *@
+@using (Ajax.BeginForm("AjaxInquiryContextMenu3", "Lot", ajaxInquiry))
+{
+    <div class="row wrapper white-bg page-heading">
+        <div class="col-lg-8 col-md-8 col-xs-12" style="display:flex;">
+            <span style="float:left; padding:0.6rem; font-size:14px;">
+                <i class="fa fa-th" aria-hidden="true"></i>
+            </span>
+            <div style="align-self:flex-end; padding:0.6rem">
+
+                <ol class="breadcrumb" style="font-size:14px;">
+                    @foreach (var page in Model.MenuLocation)
+                    {
+                        if (page == Model.ActivePage)
+                        {
+                            <li class="active">
+                                <strong>@Model.resourceManager.String("Menu_" + @page) </strong>
+                            </li>
+                        }
+                        else
+                        {
+                            <li>
+                                <span>@Model.resourceManager.String("Menu_" + @page)</span>
+                            </li>
+                        }
+                    }
+                </ol>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-4">
+            <div class="btn-group pull-right ">
+                <button class="btn bg-primary" type="submit" id="btn-find"><i class="fa fa-check"></i>&nbsp;@Resource.Inquiry</button>
+            </div>
+        </div>
+    </div>
+    <div class="row wrapper border-bottom white-bg check-item">
+        <div class="btn-group">
+            <span class="mr-3">
+                <label class="filter-title mr-1">플랜트:</label>
+                @Html.DropDownListFor(x => x.COW_FilterPlantInquiry.FirstOrDefault().PlantName,
+                                        new SelectList(Model.COW_FilterPlantInquiry.Select(s => new SelectListItem { Value = s.PlantId, Text = s.PlantName }), "Value", "Text")
+                                        , new { @class = "reco-width-M filter-item", @id = "Plants" })
+            </span>
+            <span class="mr-3">
+                <label class="filter-title mr-1">공장동:</label>
+                @Html.DropDownListFor(x => x.COW_FilterFactoriesInquiry.FirstOrDefault().FactoryName,
+                                        new SelectList(Model.COW_FilterFactoriesInquiry.Select(s => new SelectListItem { Value = s.FactoryId, Text = s.FactoryName }), "Value", "Text")
+                                        , new { @class = "reco-width-M filter-item", @id = "Factories" })
+            </span>
+            <span class="mr-3">
+                <label class="filter-title mr-1">작업유형:</label>
+                @Html.DropDownListFor(x => x.COW_FilterWorkshopTypesInquiry.FirstOrDefault().Desc,
+                                        new SelectList(Model.COW_FilterWorkshopTypesInquiry.Select(s => new SelectListItem { Value = s.WorkshopTypeId, Text = s.Desc }), "Value", "Text")
+                                        , new { @class = "reco-width-M filter-item", @id = "WorkshopTypes" })
+            </span>
+            <span class="mr-3">
+                <label class="filter-title mr-1">작업장리스트:</label>
+                @Html.DropDownListFor(x => x.COW_FilterWorkshopsInquiry.FirstOrDefault().WorkshopName,
+                                        new SelectList(Model.COW_FilterWorkshopsInquiry.Select(s => new SelectListItem { Value = s.WorkshopCode, Text = s.WorkshopName }), "Value", "Text")
+                                        , new { @class = "reco-width-M filter-item", @id = "Workshops" })
+            </span>
+            <span class="mr-3">
+                @*현재 날짜를 둘다 받아옴. 여기서 날짜를 컨트롤하고싶다면 Controller에서 날짜 지정해서 넘겨주면됨.*@
+                <label class="filter-title mr-1">일자:</label>
+                @Html.TextBoxFor(m => m.startDate, "{0:yyyy-MM-dd}", new { @class = "reco-width_XL datepicker filter-item", @data_date_format = "yyyy-mm-dd", @style = "z-index:100; border:solid #A9A9A9 1px;" })
+            </span>
+            <br />
+            <span class="mr-3">
+                <label class="filter-title mr-1">팔레트LOT:</label>
+                <input type="text" name="PaletteLotNo" id="PaletteLotNo" value="" class="filter-item" />
+            </span>
+            <span class="mr-3">
+                <label class="filter-title mr-1">LOT NO:</label>
+                <input type="text" name="LotNo" id="LotNo" value="" class="filter-item"/>
+            </span>
+            <span class="mr-3">
+                <label class="filter-title mr-1">RF태그번호:</label>
+                <input type="text" name="RfTagNo" id="RfTagNo" value="" class="filter-item" />
+            </span>
+        </div>
+    </div>
+
+}
+
+@* View파일이 너무 길어져 소스가 보기 어려워져 Partial로 실제 데이터가 나타나는 부분을 따로 분리 *@
+<div id="Context" class="row wrapper wrapper-content animated fadeInRight">
+    @Html.Partial("_LTM5Context")
+</div>
+
+
+@section Styles {
+    
+}
+
+@section Scripts {
+    <script src="~/Scripts/jquery-3.1.1.min.js"></script>
+
+    <script type="text/javascript">
+        var data2;
+        function ContextInquiry(returnValue) {
+            var data = returnValue;
+            data2 = returnValue;
+        }
+
+        $(document).ready(function () {
+
+            $(':input:checked').parent('.btn').addClass('active');
+
+            // Dropdown list change event.
+            // Dropdown list change event.
+            $('#Plants').change(function () {
+                $('#Factories option').remove();
+                $('#WorkshopTypes option').remove();
+                $('#Workshops option').remove();
+                $.getJSON('../Common/GetCOW_FilterFactoriesInquiry', { p_PlantId: $('#Plants').val() }, function (data) {
+                    $.each(data, function () {
+                        $('#Factories').append('<option value=' +
+                          this.FactoryId + '>' + this.FactoryName + '</option>');
+                    });
+
+                }).fail(function (jqXHR, textStatus, errorThrown) {
+                    alert('Error getting products!');
+                });
+
+                $.getJSON('../Common/GetCOW_FilterWorkshopTypesInquiry', { p_PlantId: $('#Plants').val() }, function (data) {
+                    $.each(data, function () {
+                        $('#WorkshopTypes').append('<option value=' +
+                          this.WorkshopTypeId + '>' + this.Desc + '</option>');
+                    });
+
+                }).fail(function (jqXHR, textStatus, errorThrown) {
+                    alert('Error getting products!');
+                });
+
+                $.getJSON('../Common/GetCOW_FilterWorkshopsInquiry', { p_PlantId: $('#Plants').val(), p_FactoryId: $('#Factories').val(), p_WorkshopTypeId: $('#WorkshopTypes').val() }, function (data) {
+                    $.each(data, function () {
+                        $('#Workshops').append('<option value=' +
+                          this.WorkshopId + '>' + this.WorkshopName + '</option>');
+                    });
+
+                }).fail(function (jqXHR, textStatus, errorThrown) {
+                    alert('Error getting products!');
+                });
+
+            });
+
+            $('#Factories').change(function () {
+                $('#Workshops option').remove();
+                $.getJSON('../Common/GetCOW_FilterWorkshopsInquiry', { p_PlantId: $('#Plants').val(), p_FactoryId: $('#Factories').val(), p_WorkshopTypeId: $('#WorkshopTypes').val() }, function (data) {
+                    $.each(data, function () {
+                        $('#Workshops').append('<option value=' +
+                          this.WorkshopId + '>' + this.WorkshopName + '</option>');
+                    });
+
+                }).fail(function (jqXHR, textStatus, errorThrown) {
+                    alert('Error getting products!');
+                });
+            });
+
+            $('#WorkshopTypes').change(function () {
+                $('#Workshops option').remove();
+                $.getJSON('../Common/GetCOW_FilterWorkshopsInquiry', { p_PlantId: $('#Plants').val(), p_FactoryId: $('#Factories').val(), p_WorkshopTypeId: $('#WorkshopTypes').val() }, function (data) {
+                    $.each(data, function () {
+                        $('#Workshops').append('<option value=' +
+                          this.WorkshopId + '>' + this.WorkshopName + '</option>');
+                    });
+
+                }).fail(function (jqXHR, textStatus, errorThrown) {
+                    alert('Error getting products!');
+                });
+            });
+
+            //showGrid1();
+
+            $('.datepicker').datepicker({
+                language: 'ko'
+                , autoclose: true
+            });
+        });
+    </script>
+}
